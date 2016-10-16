@@ -1,0 +1,9 @@
+
+alias l="ls -al"
+alias view="vi -R"
+
+export EDITOR=vi
+
+export PS1='$USER@`uname -n`:`pwd`>
+$ '
+
