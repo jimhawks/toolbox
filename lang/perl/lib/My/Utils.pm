@@ -12,20 +12,20 @@ require Exporter;
 our @ISA = qw( Exporter );
 
 our @EXPORT = qw(
-    isEmpty 
-    isNonEmpty 
+    isEmpty
+    isNonEmpty
     nvl
 );
 
 
 
-sub isEmpty 
+sub isEmpty
 {
-    my $rc = isStringNonEmpty( @_ ) ? 0 : 1;
+    my $rc = isNonEmpty( @_ ) ? 0 : 1;
     return( $rc );
 }
 
-sub isNonEmpty 
+sub isNonEmpty
 {
     my $str = shift;
     my $rc = ( defined( $str ) and length( $str ) > 0 ) ? 1 : 0;
@@ -36,13 +36,13 @@ sub getCmdLineOptions
 {
    my @optionSpec = @_;
          # url:  https://perldoc.perl.org/Getopt::Long
-         # 
+         #
          # summary
          #    format:  <option>[ <required><type> ]
          #
-         #    <option>  
+         #    <option>
          #    <required>
-         #       :   value is optional 
+         #       :   value is optional
          #       =   value is required
          #    <type>
          #       s   string
@@ -76,4 +76,3 @@ sub nvl
 }
 
 1;
-
