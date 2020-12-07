@@ -9,7 +9,10 @@ use TAP::Harness;
 my @tests = qw(
    isEmpty.t
    isNonEmpty.t
-   nvl.t   
+   ltrim.t
+   nvl.t
+   rtrim.t
+   trim.t
 );
 
 my %args = (

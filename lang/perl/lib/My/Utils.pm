@@ -14,9 +14,14 @@ our @ISA = qw( Exporter );
 our @EXPORT = qw(
     isEmpty
     isNonEmpty
+	ltrim
     nvl
+	rtrim
+	trim
 );
 
+#todo
+#   trim
 
 
 sub isEmpty
@@ -34,7 +39,7 @@ sub isNonEmpty
 
 sub getCmdLineOptions
 {
-   my @optionSpec = @_;
+   my @optionsSpec = @_;
          # url:  https://perldoc.perl.org/Getopt::Long
          #
          # summary
@@ -62,10 +67,17 @@ sub getCmdLineOptions
 
    my %options = ();
 
-   GetOptions( \%options, @optionSpec ) or confess "ERROR... get options failed.";
-
+   GetOptions( \%options, @optionsSpec ) or confess "ERROR... get options failed.";
 
    return( %options );
+}
+
+sub ltrim
+{
+   my $str = nvl( shift, "" );
+   isNonEmpty( $str ) or return "";
+   $str =~ s/^\s+//;
+   return( $str );
 }
 
 sub nvl
@@ -73,6 +85,19 @@ sub nvl
    my $val     = shift;
    my $default = shift;
    return( isNonEmpty( $val ) ? $val : $default );
+}
+
+sub rtrim
+{
+   my $str = nvl( shift, "" );
+   isNonEmpty( $str ) or return "";
+   $str =~ s/\s+$//;
+   return( $str );
+}
+
+sub trim
+{
+   return( rtrim( ltrim( @_ ) ) );
 }
 
 1;
