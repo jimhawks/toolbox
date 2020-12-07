@@ -20,9 +20,6 @@ our @EXPORT = qw(
 	trim
 );
 
-#todo
-#   trim
-
 
 sub isEmpty
 {
