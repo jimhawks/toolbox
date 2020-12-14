@@ -12,27 +12,15 @@ require Exporter;
 our @ISA = qw( Exporter );
 
 our @EXPORT = qw(
-    isEmpty
-    isNonEmpty
-	ltrim
-    nvl
-	rtrim
-	trim
+   getCmdLineOptions
+   isEmpty
+   isNonEmpty
+   trim
+   nvl
+   rtrim
+   trim
 );
 
-
-sub isEmpty
-{
-    my $rc = isNonEmpty( @_ ) ? 0 : 1;
-    return( $rc );
-}
-
-sub isNonEmpty
-{
-    my $str = shift;
-    my $rc = ( defined( $str ) and length( $str ) > 0 ) ? 1 : 0;
-    return( $rc );
-}
 
 sub getCmdLineOptions
 {
@@ -67,6 +55,19 @@ sub getCmdLineOptions
    GetOptions( \%options, @optionsSpec ) or confess "ERROR... get options failed.";
 
    return( %options );
+}
+
+sub isEmpty
+{
+    my $rc = isNonEmpty( @_ ) ? 0 : 1;
+    return( $rc );
+}
+
+sub isNonEmpty
+{
+    my $str = shift;
+    my $rc = ( defined( $str ) and length( $str ) > 0 ) ? 1 : 0;
+    return( $rc );
 }
 
 sub ltrim
