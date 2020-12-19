@@ -7,8 +7,9 @@ use Data::Dumper;
 use TAP::Harness;
 
 my @tests = qw(
-   isEmpty.t
-   isNonEmpty.t
+   get_cmd_line_options.t
+   is_empty.t
+   is_non_empty.t
    ltrim.t
    nvl.t
    rtrim.t

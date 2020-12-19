@@ -12,17 +12,17 @@ require Exporter;
 our @ISA = qw( Exporter );
 
 our @EXPORT = qw(
-   getCmdLineOptions
-   isEmpty
-   isNonEmpty
-   trim
+   get_cmd_line_options
+   is_empty
+   is_non_empty
+   ltrim
    nvl
    rtrim
    trim
 );
 
 
-sub getCmdLineOptions
+sub get_cmd_line_options
 {
    my @optionsSpec = @_;
          # url:  https://perldoc.perl.org/Getopt::Long
@@ -57,13 +57,13 @@ sub getCmdLineOptions
    return( %options );
 }
 
-sub isEmpty
+sub is_empty
 {
-    my $rc = isNonEmpty( @_ ) ? 0 : 1;
+    my $rc = is_non_empty( @_ ) ? 0 : 1;
     return( $rc );
 }
 
-sub isNonEmpty
+sub is_non_empty
 {
     my $str = shift;
     my $rc = ( defined( $str ) and length( $str ) > 0 ) ? 1 : 0;
@@ -73,7 +73,7 @@ sub isNonEmpty
 sub ltrim
 {
    my $str = nvl( shift, "" );
-   isNonEmpty( $str ) or return "";
+   is_non_empty( $str ) or return "";
    $str =~ s/^\s+//;
    return( $str );
 }
@@ -82,13 +82,13 @@ sub nvl
 {
    my $val     = shift;
    my $default = shift;
-   return( isNonEmpty( $val ) ? $val : $default );
+   return( is_non_empty( $val ) ? $val : $default );
 }
 
 sub rtrim
 {
    my $str = nvl( shift, "" );
-   isNonEmpty( $str ) or return "";
+   is_non_empty( $str ) or return "";
    $str =~ s/\s+$//;
    return( $str );
 }

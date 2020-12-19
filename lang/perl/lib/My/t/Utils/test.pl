@@ -1,11 +1,7 @@
-#!C:\Strawberry\perl\bin\perl.exe
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
 use Data::Dumper;
 
-@ARGV=( "v1", "v2" );
-
-print Dumper( \@ARGV );
-
-exit 0;
+print Dumper (\@ARGV);
