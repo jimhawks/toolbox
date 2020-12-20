@@ -30,24 +30,8 @@ my %opt_expect  = ();
 );
 @ARGV = @argv_start;
 %opt_got = get_cmd_line_options( @opt_spec );
-is_deeply( \%opt_got, \%opt_expect, "no args, no opts, empty optspec. opts" );
-is_deeply( \@ARGV, \@argv_expect,   "no args, no opts, empty optspec. args" );
-
-#########
-@argv_start = qw(
-   arg1
-);
-@opt_spec = qw(
-);
-%opt_expect = (
-);
-@argv_expect = qw(
-   arg1
-);
-@ARGV = @argv_start;
-%opt_got = get_cmd_line_options( @opt_spec );
-is_deeply( \%opt_got, \%opt_expect, "1 arg, no opts, empty optspec. opts" );
-is_deeply( \@ARGV, \@argv_expect,   "1 arg, no opts, empty optspec. args" );
+is_deeply( \%opt_got, \%opt_expect, "no args, no opts, no optspec. opts" );
+is_deeply( \@ARGV, \@argv_expect,   "no args, no opts, no optspec. args" );
 
 #########
 @argv_start = qw(
@@ -64,11 +48,33 @@ is_deeply( \@ARGV, \@argv_expect,   "1 arg, no opts, empty optspec. args" );
 );
 @ARGV = @argv_start;
 %opt_got = get_cmd_line_options( @opt_spec );
-is_deeply( \%opt_got, \%opt_expect, "2 args, no opts, empty optspec. opts" );
-is_deeply( \@ARGV, \@argv_expect,   "2 args, no opts, empty optspec. args" );
+is_deeply( \%opt_got, \%opt_expect, "2 args, no opts, no optspec. opts" );
+is_deeply( \@ARGV, \@argv_expect,   "2 args, no opts, no optspec. args" );
 
 #########
 @argv_start = qw(
+   arg1
+   arg2
+);
+@opt_spec = qw(
+   opt1
+   opt2
+);
+%opt_expect = (
+);
+@argv_expect = qw(
+   arg1
+   arg2
+);
+@ARGV = @argv_start;
+%opt_got = get_cmd_line_options( @opt_spec );
+is_deeply( \%opt_got, \%opt_expect, "2 args, no opts, 2 optspec. opts" );
+is_deeply( \@ARGV, \@argv_expect,   "2 args, no opts, 2 optspec. args" );
+
+#########
+@argv_start = qw(
+   -opt90
+   -opt91
    arg1
    arg2
 );
@@ -78,41 +84,46 @@ is_deeply( \@ARGV, \@argv_expect,   "2 args, no opts, empty optspec. args" );
 %opt_expect = (
 );
 @argv_expect = qw(
+   -opt90
+   -opt91
    arg1
    arg2
 );
 @ARGV = @argv_start;
 %opt_got = get_cmd_line_options( @opt_spec );
-is_deeply( \%opt_got, \%opt_expect, "1+ args, no opts, nonempty optspec. opts" );
-is_deeply( \@ARGV, \@argv_expect,   "1+ args, no opts, nonempty optspec. args" );
+is_deeply( \%opt_got, \%opt_expect, "2 args, 2 opts, 1 optspec. no match. opts" );
+is_deeply( \@ARGV, \@argv_expect,   "2 args, 2 opts, 1 optspec. no match. args" );
 
 #########
 @argv_start = qw(
    -opt90
    -opt1
+   -opt2
    -opt91
+   -opt92
    arg1
    arg2
 );
 @opt_spec = qw(
    opt1
+   opt2
+   opt3
 );
 %opt_expect = (
    opt1 => 1,
+   opt2 => 1,
 );
 @argv_expect = qw(
    -opt90
    -opt91
+   -opt92
    arg1
    arg2
 );
 @ARGV = @argv_start;
 %opt_got = get_cmd_line_options( @opt_spec );
-is_deeply( \%opt_got, \%opt_expect, "1+ args, 3 opt, 1 optspec. 1 spec match.  opts" );
-is_deeply( \@ARGV, \@argv_expect,   "1+ args, 3 opt, 1 optspec. 1 spec match.  args" );
-
-
-
+is_deeply( \%opt_got, \%opt_expect, "2 args, 5 opts, 3 optspec. 2 match. opts" );
+is_deeply( \@ARGV, \@argv_expect,   "2 args, 5 opts, 3 optspec. 2 match. args" );
 
 
 done_testing();

@@ -12,6 +12,7 @@ require Exporter;
 our @ISA = qw( Exporter );
 
 our @EXPORT = qw(
+   add_new_lines
    get_cmd_line_options
    is_empty
    is_non_empty
@@ -21,6 +22,32 @@ our @EXPORT = qw(
    trim
 );
 
+#### tbd
+# is_substr_in_strings
+# is_substr_not_in_strings
+# is_substrs_in_strings
+# is_substrs_not_in_strings
+# read_file
+# write_file_new
+# write_file_append
+# get_list_of_files
+# get_list_of_files_using_unxutils
+
+sub add_new_lines
+{
+   my @arr = @_;
+   if ( $#arr >= 0 )
+   {
+      foreach my $line ( @arr )
+      {
+         if ( defined( $line ) )
+	 {
+            $line .= "\n";
+         }
+      }
+   }
+   return( @arr );
+}
 
 sub get_cmd_line_options
 {
