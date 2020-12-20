@@ -8,6 +8,7 @@ use TAP::Harness;
 
 my @tests = qw(
    get_cmd_line_options.t
+   grepi_array.t
    is_empty.t
    is_non_empty.t
    ltrim.t

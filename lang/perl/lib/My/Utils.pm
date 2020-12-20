@@ -14,6 +14,7 @@ our @ISA = qw( Exporter );
 our @EXPORT = qw(
    add_new_lines
    get_cmd_line_options
+   grepi_array
    is_empty
    is_non_empty
    ltrim
@@ -23,10 +24,10 @@ our @EXPORT = qw(
 );
 
 #### tbd
-# is_substr_in_strings
-# is_substr_not_in_strings
-# is_substrs_in_strings
-# is_substrs_not_in_strings
+## is_substr_in_strings
+## is_substr_not_in_strings
+## is_substrs_in_strings
+## is_substrs_not_in_strings
 # read_file
 # write_file_new
 # write_file_append
@@ -82,6 +83,31 @@ sub get_cmd_line_options
    GetOptions( \%options, @optionsSpec ) or confess "ERROR... get options failed.";
 
    return( %options );
+}
+
+sub grepi_array
+{
+   my $strs_ref  = shift;
+   my $lines_ref = shift;
+
+   my @empty_array = ();
+
+   $#{ $strs_ref } >= 0 or return( @empty_array );
+
+   my @matching_lines = @{ $lines_ref };
+   foreach my $str ( @{ $strs_ref } )
+   {
+      my @tmp = ();
+      foreach my $line ( @matching_lines )
+      {
+         if ( $line =~ /$str/i )
+         {
+             push( @tmp, $line );
+	 }
+      }
+      @matching_lines = @tmp;
+   }
+   return( @matching_lines );
 }
 
 sub is_empty
