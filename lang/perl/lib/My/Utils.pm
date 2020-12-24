@@ -97,12 +97,26 @@ sub grepi_array
    my @matching_lines = @{ $lines_ref };
    foreach my $str ( @{ $strs_ref } )
    {
+      defined( $str ) or return ( @empty_array );
+
       my @tmp = ();
       foreach my $line ( @matching_lines )
       {
-         if ( $line =~ /$str/i )
+         if ( !defined( $line ) ) 
          {
-             push( @tmp, $line );
+            # do nothing
+         }
+         elsif ( is_empty( $str ) and is_non_empty( $line ) ) 
+         {
+            # do nothing
+         }
+         elsif ( is_empty( $str ) and is_empty( $line ) ) 
+         {
+            push( @tmp, $line );
+         }
+         elsif ( $line =~ /$str/i )
+         {
+            push( @tmp, $line );
 	 }
       }
       @matching_lines = @tmp;
@@ -112,7 +126,8 @@ sub grepi_array
 
 sub is_empty
 {
-    my $rc = is_non_empty( @_ ) ? 0 : 1;
+    my $str = shift;
+    my $rc = ( !defined( $str ) or length( $str ) == 0 ) ? 1 : 0;
     return( $rc );
 }
 

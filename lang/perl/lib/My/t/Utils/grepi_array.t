@@ -20,7 +20,10 @@ my @lines_1 = (
 my @lines_many = (
    "Four score and seven years",
    "Four score and seven years ago our fathers",
+   "",
+   undef,
    "Four score and seven years ago our fathers brought forth",
+   "",
    "Four score and seven years ago our fathers brought forth, upon this continent",
 );
 
@@ -185,6 +188,36 @@ is_deeply( \@got, \@expect, "4 str, 2+ lines, match 0 lines");
 );
 @got = grepi_array( \@strs, \@lines_many );
 is_deeply( \@got, \@expect, "3 str, all the same");
+
+#################################
+@strs = (
+   undef,
+);
+@expect = (
+);
+@got = grepi_array( \@strs, \@lines_many );
+is_deeply( \@got, \@expect, "str - 1 value - undef");
+
+#################################
+@strs = (
+   "FATHER",
+   undef,
+);
+@expect = (
+);
+@got = grepi_array( \@strs, \@lines_many );
+is_deeply( \@got, \@expect, "str - 2 values - 2nd undef");
+
+#################################
+@strs = (
+   "",
+);
+@expect = (
+   "",
+   "",
+);
+@got = grepi_array( \@strs, \@lines_many );
+is_deeply( \@got, \@expect, "str - 1 value - empty str");
 
 
 done_testing();
