@@ -19,6 +19,7 @@ our @EXPORT = qw(
    is_non_empty
    ltrim
    nvl
+   read_file
    rtrim
    trim
 );
@@ -151,6 +152,22 @@ sub nvl
    my $val     = shift;
    my $default = shift;
    return( is_non_empty( $val ) ? $val : $default );
+}
+
+sub read_file
+{
+   my $fname = nvl( shift || "" );
+
+   is_non_empty( $fname ) or die "ERROR. Filename is empty";
+   -e $fname or die "ERROR. File not found";
+   -f $fname or die "ERROR. File is not a file";
+   -r $fname or die "ERROR. File is not readable";
+
+   open( my $FH, "<", $fname ) or die "ERROR. Cannot open file";
+   my @lines = <$FH>;
+   close( $FH );
+
+   return( @lines );
 }
 
 sub rtrim
