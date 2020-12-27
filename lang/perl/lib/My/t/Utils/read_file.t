@@ -18,6 +18,16 @@ use My::Utils qw(
 my $SCRIPT = basename( $0 );
 my $DATA_DIR = ${SCRIPT} . ".data";
 
+###############################################################
+#
+# tests
+#
+###############################################################
+
+my @expect = ();
+my @got    = ();
+
+
 # undef filename
 throws_ok { read_file( undef ) } qr/Filename is empty/, "undef filename";
 
@@ -36,44 +46,26 @@ throws_ok { read_file( "$DATA_DIR/file_not_readable" ) } qr/File is not readable
 chmod 0664, "$DATA_DIR/file_not_readable";
 
 # file is empty
+@expect = ();
+@got = read_file( "$DATA_DIR/empty_file" );
+is_deeply( \@got, \@expect, "empty file" );
+
 # file is nonempty, 1 line
+@expect = ("Four score and seven years\n");
+@got = read_file( "$DATA_DIR/one_line" );
+is_deeply( \@got, \@expect, "1 line file" );
+
 # file is nonempty, multiple lines
-# file is a binary file
-
-
-
-
-
-
-
-#my @lines_empty = ();
-#my @lines_1 = (
-#   "Four score and seven years ago our fathers brought forth, upon this continent",
-#);
-#my @lines_many = (
-#   "Four score and seven years",
-#   "Four score and seven years ago our fathers",
-#   "",
-#   undef,
-#   "Four score and seven years ago our fathers brought forth",
-#   "",
-#   "Four score and seven years ago our fathers brought forth, upon this continent",
-#);
-#
-#my @strs   = ();
-#my @got    = ();
-#my @expect = ();
-#
-##################################
-#@strs = (
-#   "father",
-#);
-#@expect = (
-#   "Four score and seven years ago our fathers brought forth, upon this continent",
-#);
-#@got = read_file( \@strs, \@lines_1 );
-#is_deeply( \@got, \@expect, "1 str, 1 line, yes match, case match");
-
+@expect = (
+   "Four score and seven years\n",
+   "\n",
+   "Four score and seven years ago our fathers \n",
+   "\n",
+   "\n",
+   "Four score and seven years ago our fathers brought forth, upon this continent\n",
+);
+@got = read_file( "$DATA_DIR/multiple_lines" );
+is_deeply( \@got, \@expect, "2+ lines file" );
 
 
 done_testing();

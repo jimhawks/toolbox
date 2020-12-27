@@ -13,6 +13,7 @@ my @tests = qw(
    is_non_empty.t
    ltrim.t
    nvl.t
+   read_file.t
    rtrim.t
    trim.t
 );
