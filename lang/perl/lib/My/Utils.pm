@@ -29,7 +29,6 @@ our @EXPORT = qw(
 ## is_substr_not_in_strings
 ## is_substrs_in_strings
 ## is_substrs_not_in_strings
-# read_file
 # write_file_new
 # write_file_append
 # get_list_of_files
