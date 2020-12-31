@@ -16,6 +16,8 @@ our @ISA = qw( Exporter );
 our @EXPORT = qw(
    add_new_lines
    get_cmd_line_options
+   get_dir_list
+   get_file_list
    get_filesys_list
    grepi_array
    is_empty
@@ -34,7 +36,6 @@ our @EXPORT = qw(
 ## is_substrs_not_in_strings
 # write_file_new
 # write_file_append
-# get_filesys_list
 # get_filesys_list_using_unxutils
 
 #===============================================================
@@ -58,6 +59,10 @@ sub _gfl_wanted
 
 sub add_new_lines
 {
+   # desc:   Add newline to each string in an array
+   # input:  [array] array of strings
+   # output: [array] array of strings
+
    my @arr = @_;
    if ( $#arr >= 0 )
    {
@@ -74,6 +79,10 @@ sub add_new_lines
 
 sub get_cmd_line_options
 {
+   # desc:   Get options from cmd line
+   # input:  [array] options spec array
+   # output: [hash] hash of options
+
    my @optionsSpec = @_;
          # url:  https://perldoc.perl.org/Getopt::Long
          #
@@ -105,6 +114,38 @@ sub get_cmd_line_options
    GetOptions( \%options, @optionsSpec ) or confess "ERROR... get options failed.";
 
    return( %options );
+}
+
+sub get_dir_list
+{
+   my @filesys_list = get_filesys_list( @_ );
+
+   my @dir_list = ();
+   foreach my $item ( @filesys_list )
+   {
+      if ( -d $item )
+      {
+         push( @dir_list, $item );
+      }
+   }
+
+   return( @dir_list );
+}
+
+sub get_file_list
+{
+   my @filesys_list = get_filesys_list( @_ );
+
+   my @file_list = ();
+   foreach my $item ( @filesys_list )
+   {
+      if ( -f $item )
+      {
+         push( @file_list, $item );
+      }
+   }
+
+   return( @file_list );
 }
 
 sub get_filesys_list
