@@ -4,9 +4,11 @@ use strict;
 use warnings;
 
 use Carp qw( cluck confess );
-
+use File::Find;
 use Getopt::Long;
 Getopt::Long::Configure( "pass_through" );
+
+no warnings "File::Find";
 
 require Exporter;
 our @ISA = qw( Exporter );
@@ -14,6 +16,7 @@ our @ISA = qw( Exporter );
 our @EXPORT = qw(
    add_new_lines
    get_cmd_line_options
+   get_filesys_list
    grepi_array
    is_empty
    is_non_empty
@@ -31,8 +34,27 @@ our @EXPORT = qw(
 ## is_substrs_not_in_strings
 # write_file_new
 # write_file_append
-# get_list_of_files
-# get_list_of_files_using_unxutils
+# get_filesys_list
+# get_filesys_list_using_unxutils
+
+#===============================================================
+#
+# private
+#
+#===============================================================
+
+my @_gfl_file_list = ();
+
+sub _gfl_wanted
+{
+   push( @_gfl_file_list, $File::Find::name );
+}
+
+#===============================================================
+#
+# public
+#
+#===============================================================
 
 sub add_new_lines
 {
@@ -83,6 +105,21 @@ sub get_cmd_line_options
    GetOptions( \%options, @optionsSpec ) or confess "ERROR... get options failed.";
 
    return( %options );
+}
+
+sub get_filesys_list
+{
+   my $dir = nvl( shift, "");
+
+   is_non_empty( $dir ) or die "ERROR. Dir name is empty";
+   -e $dir or die "ERROR. Dir not found. dir=[$dir]";
+   -d $dir or die "ERROR. Dir is not a dir. dir=[$dir]";
+   -r $dir or die "ERROR. Dir is not readable. dir=[$dir]";
+
+   @_gfl_file_list = ();
+   find( { wanted => \&_gfl_wanted }, $dir );
+
+   return( sort @_gfl_file_list );
 }
 
 sub grepi_array
@@ -155,14 +192,14 @@ sub nvl
 
 sub read_file
 {
-   my $fname = nvl( shift || "" );
+   my $file = nvl( shift, "" );
 
-   is_non_empty( $fname ) or die "ERROR. Filename is empty";
-   -e $fname or die "ERROR. File not found";
-   -f $fname or die "ERROR. File is not a file";
-   -r $fname or die "ERROR. File is not readable";
+   is_non_empty( $file ) or die "ERROR. Filename is empty";
+   -e $file or die "ERROR. File not found. file=[$file]";
+   -f $file or die "ERROR. File is not a file. file=[$file]";
+   -r $file or die "ERROR. File is not readable. file=[$file]";
 
-   open( my $FH, "<", $fname ) or die "ERROR. Cannot open file";
+   open( my $FH, "<", $file ) or die "ERROR. Cannot open file";
    my @lines = <$FH>;
    close( $FH );
 

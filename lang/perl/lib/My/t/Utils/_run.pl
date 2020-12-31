@@ -8,6 +8,7 @@ use TAP::Harness;
 
 my @tests = qw(
    get_cmd_line_options.t
+   get_filesys_list.t
    grepi_array.t
    is_empty.t
    is_non_empty.t
