@@ -247,10 +247,33 @@ is_deeply( \%got,  \%exp,      "3 args, 2nd is array arg. obj" );
 is_deeply( \@ARGV, \@exp_argv, "3 args, 2nd is array arg. argv" );
 
 
+# no args for array arg
+@arg_list = qw(
+   arg1
+   @arg2
+);
+@ARGV = qw(
+   str1
+);
+$obj  = new My::Objects::Exe( arg_list => \@arg_list );
+%got  = $obj->get_args();
+%exp  = (
+   arg1 => "str1",
+   arg2 => [  ],
+);
+@exp_argv = ();
+is_deeply( \%got,  \%exp,      "no args for array arg. obj" );
+is_deeply( \@ARGV, \@exp_argv, "no args for array arg. argv" );
+
+
 # cmd line has opts and args
 @arg_list = qw(
    arg1
    arg2
+);
+@opt_spec = qw(
+   opt1=s
+   opt2=s
 );
 @ARGV = qw(
    -opt1=value1
@@ -259,7 +282,7 @@ is_deeply( \@ARGV, \@exp_argv, "3 args, 2nd is array arg. argv" );
    str2
    str3
 );
-$obj  = new My::Objects::Exe( arg_list => \@arg_list );
+$obj  = new My::Objects::Exe( arg_list => \@arg_list, opt_spec => \@opt_spec );
 %got  = $obj->get_args();
 %exp  = (
    arg1 => "str1",
@@ -269,6 +292,56 @@ $obj  = new My::Objects::Exe( arg_list => \@arg_list );
 is_deeply( \%got,  \%exp,      "cmd line has opts and args. obj" );
 is_deeply( \@ARGV, \@exp_argv, "cmd line has opts and args. argv" );
 
+# skip unprocessed options
+@arg_list = qw(
+   arg1
+   arg2
+);
+@opt_spec = qw(
+   opt1=s
+);
+@ARGV = qw(
+   -opt1=value1
+   -opt2=value2
+   str1
+   str2
+   str3
+);
+$obj  = new My::Objects::Exe( arg_list => \@arg_list, opt_spec => \@opt_spec );
+%got  = $obj->get_args();
+%exp  = (
+   arg1 => "str1",
+   arg2 => "str2",
+);
+@exp_argv = ( "str3" );
+is_deeply( \%got,  \%exp,      "skip unprocessed options. obj" );
+is_deeply( \@ARGV, \@exp_argv, "skip unprocessed options. argv" );
+
+
+# skip unprocessed options between args
+@arg_list = qw(
+   arg1
+   arg2
+);
+@opt_spec = qw(
+   opt1=s
+);
+@ARGV = qw(
+   -opt1=value1
+   str1
+   -opt2=value2
+   str2
+   str3
+);
+$obj  = new My::Objects::Exe( arg_list => \@arg_list, opt_spec => \@opt_spec );
+%got  = $obj->get_args();
+%exp  = (
+   arg1 => "str1",
+   arg2 => "str2",
+);
+@exp_argv = ( "str3" );
+is_deeply( \%got,  \%exp,      "skip unprocessed options between args. obj" );
+is_deeply( \@ARGV, \@exp_argv, "skip unprocessed options between args. argv" );
 
 done_testing();
 

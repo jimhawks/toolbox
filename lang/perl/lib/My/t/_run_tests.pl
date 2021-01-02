@@ -6,11 +6,10 @@ use Data::Dumper;
 
 use TAP::Harness;
 
-my @tests = qw(
-   get_args.t
-   new.t
-   obj.t
-);
+my @tests = ();
+
+push( @tests, glob "*.t" );
+push( @tests, glob "*/*.t" );
 
 my %args = (
    verbosity => 1,

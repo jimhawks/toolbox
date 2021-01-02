@@ -8,6 +8,7 @@ use Carp qw( cluck confess );
 
 use lib "$FindBin::Bin/../../../../../lib";
 use My::Utils qw(
+   get_cmd_line_options
    is_array_cnt_even
    is_non_empty
    nvl
@@ -157,34 +158,42 @@ sub _init_obj
    my @arg_list = @{ $args{ arg_list } };
 
    # set options
+   my %options = get_cmd_line_options( @opt_spec );
+   foreach my $key ( sort keys %options )
+   {
+      $self->_set_opt( $key, $options{ $key } );
+   }
 
    # set args
    foreach my $arg ( @arg_list )
    {
+      # process array arg
       if ( $arg =~ /^@/ )
       {
          $arg =~ s/^@//;
-         $self->_set_arg_array( $arg, @ARGV );
+         my @tmp = @ARGV;
+         $self->_set_arg( $arg, \@tmp );
          @ARGV = ();
          last;
       }
-      $self->_set_arg_value( $arg, nvl( shift @ARGV, "" ) );
+
+      # skip unprocessed options
+      my $value = "";
+      while( 1 )
+      {
+         $value = nvl( shift @ARGV, "" );
+         if ( $value !~ /^-/ )
+         {
+            last;
+         }
+      }
+
+      # set arg
+      $self->_set_arg( $arg, $value );
    }
 }
 
-sub _set_arg_array
-{
-   my $self = shift;
-
-   my $key   = shift;
-   my @value = @_;
-
-   is_non_empty( $key ) or die "ERROR. Key is empty";
-
-   $self->get_args()->{ $key } = \@value;
-}
-
-sub _set_arg_value
+sub _set_arg
 {
    my $self = shift;
 
@@ -194,6 +203,18 @@ sub _set_arg_value
    is_non_empty( $key ) or die "ERROR. Key is empty";
 
    $self->get_args()->{ $key } = $value;
+}
+
+sub _set_opt
+{
+   my $self = shift;
+
+   my $key   = shift;
+   my $value = shift;
+
+   is_non_empty( $key ) or die "ERROR. Key is empty";
+
+   $self->get_options()->{ $key } = $value;
 }
 
 
