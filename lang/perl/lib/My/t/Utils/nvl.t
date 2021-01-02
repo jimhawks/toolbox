@@ -15,7 +15,7 @@ use My::Utils qw(
 
 # values
 is( nvl(undef, "rst"), "rst", "undef");
-is( nvl("",    "rst"), "rst", "empty string");
+is( nvl("",    "rst"), "",    "empty string");
 is( nvl("abc", "rst"), "abc", "nonempty string");
 is( nvl(0,     "rst"), 0,     "zero");
 is( nvl(123,   "rst"), 123,   "multi digit int");

@@ -17,10 +17,23 @@ my @argList = qw(
    arg2
 );
 
-my $obj = new My::Objects::Exe( optSpec => \@optSpec, argList => \@argList );
+#my $obj = new My::Objects::Exe( optSpec => \@optSpec, argList => \@argList );
 #my $obj = new My::Objects::Exe( );
 
-print Dumper( $obj );
+#print Dumper( $obj );
+
+myfunc( dog => "woof" );
+
+myfunc( dog => { cat => "meow" } );
 
 
 exit 0;
+
+sub myfunc
+{
+   print Dumper( \@_ );
+   my %hash = @_;
+
+   print Dumper( \%hash );
+}
+

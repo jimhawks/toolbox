@@ -20,6 +20,7 @@ our @EXPORT = qw(
    get_file_list
    get_filesys_list
    grepi_array
+   is_array_cnt_even
    is_empty
    is_non_empty
    ltrim
@@ -202,6 +203,14 @@ sub grepi_array
    return( @matching_lines );
 }
 
+sub is_array_cnt_even
+{
+   my @arr = @_;
+
+   my $cnt = ($#arr) + 1;
+   return( $cnt % 2 == 0 ? 1 : 0 );
+}
+
 sub is_empty
 {
     my $str = shift;
@@ -228,7 +237,7 @@ sub nvl
 {
    my $val     = shift;
    my $default = shift;
-   return( is_non_empty( $val ) ? $val : $default );
+   return( defined( $val ) ? $val : $default );
 }
 
 sub read_file

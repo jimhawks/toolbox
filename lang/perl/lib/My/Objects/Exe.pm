@@ -8,6 +8,7 @@ use Carp qw( cluck confess );
 
 use lib "$FindBin::Bin/../../../../../lib";
 use My::Utils qw(
+   is_array_cnt_even
    is_non_empty
    nvl
 );
@@ -24,14 +25,14 @@ sub new
    my $self  = { };
    bless $self, $class;
 
-   $self->_initObj( @_ );
+   $self->_init_obj( @_ );
 
    return $self
 }
 
 #---------------------------------------------------
 
-sub getArgs
+sub get_args
 {
    my $self = shift;
 
@@ -46,7 +47,7 @@ sub getArgs
    );
 }
 
-sub getData
+sub get_data
 {
    my $self = shift;
 
@@ -61,7 +62,7 @@ sub getData
    );
 }
 
-sub getOptions
+sub get_options
 {
    my $self = shift;
 
@@ -78,19 +79,11 @@ sub getOptions
 
 #---------------------------------------------------
 
-sub setArgValue
+sub get_arg_array
 {
-   my $self = shift;
-
-   my $key   = shift;
-   my $value = shift;
-
-   is_non_empty( $key ) or die "ERROR. Key is empty";
-
-   $self->getArgs()->{ $key } = $value;
 }
 
-sub getArgValue
+sub get_arg_value
 {
    my $self = shift;
 
@@ -98,15 +91,46 @@ sub getArgValue
 
    is_non_empty( $key ) or die "ERROR. Key is empty";
 
-   if ( !exists( $self->getArgs()->{ $key } ) )
+   if ( !exists( $self->get_args()->{ $key } ) )
    {
-      $self->getArgs()->{ $key } = "";
+      $self->get_args()->{ $key } = "";
    }
 
-   return( $self->getArgs()->{ $key } );
+   return( $self->get_args()->{ $key } );
 }
 
 
+sub get_data_array
+{
+}
+
+sub set_data_array
+{
+}
+
+sub get_data_hash
+{
+}
+
+sub set_data_hash
+{
+}
+
+sub get_data_value
+{
+}
+
+sub set_data_value
+{
+}
+
+sub get_option_array
+{
+}
+
+sub get_option_value
+{
+}
 
 
 
@@ -116,29 +140,60 @@ sub getArgValue
 #
 #===============================================================
 
-sub _initObj
+sub _init_obj
 {
    my $self = shift;
+
+   is_array_cnt_even( @_ ) or die "ERROR. Args is not a hash";
+
    my %args = @_;
+   
+   # initialize received args
+   $args{ opt_spec } = nvl( $args{ opt_spec }, [] );
+   $args{ arg_list } = nvl( $args{ arg_list }, [] );
 
-   $args{ optSpec } = nvl( $args{ optSpec }, [] );
-   $args{ argList } = nvl( $args{ argList }, [] );
+   # copy arg arrays to local arrays for easier use
+   my @opt_spec = @{ $args{ opt_spec } };
+   my @arg_list = @{ $args{ arg_list } };
 
-   my @optSpec = @{ $args{ optSpec } };
-   my @argList = @{ $args{ argList } };
+   # set options
 
-   my %h1 = ();
-   foreach my $arg ( @argList )
+   # set args
+   foreach my $arg ( @arg_list )
    {
       if ( $arg =~ /^@/ )
       {
          $arg =~ s/^@//;
-         @{ $h1{ $arg } } = @ARGV;
+         $self->_set_arg_array( $arg, @ARGV );
          @ARGV = ();
          last;
       }
-      $self->setArgValue( $arg, nvl( shift @ARGV, "" ) );
+      $self->_set_arg_value( $arg, nvl( shift @ARGV, "" ) );
    }
+}
+
+sub _set_arg_array
+{
+   my $self = shift;
+
+   my $key   = shift;
+   my @value = @_;
+
+   is_non_empty( $key ) or die "ERROR. Key is empty";
+
+   $self->get_args()->{ $key } = \@value;
+}
+
+sub _set_arg_value
+{
+   my $self = shift;
+
+   my $key   = shift;
+   my $value = shift;
+
+   is_non_empty( $key ) or die "ERROR. Key is empty";
+
+   $self->get_args()->{ $key } = $value;
 }
 
 

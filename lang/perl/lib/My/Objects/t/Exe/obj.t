@@ -22,19 +22,32 @@ my $DATA_DIR = $FindBin::Bin . "/" . ${SCRIPT} . ".data";
 #
 ###############################################################
 
+# public methods exist
+can_ok( 
+   "My::Objects::Exe", 
+   qw(
+      new 
 
-# empty new
-lives_ok { new My::Objects::Exe() } "empty new ";
+      get_args
+      get_data
+      get_options
 
-# single item array
-throws_ok { new My::Objects::Exe( 1 ) } qr/Args is not a hash/, "single item array";
+      get_arg_array
+      get_arg_value
+      get_option_array
+      get_option_value
 
-# even number array
-lives_ok { new My::Objects::Exe( 1, 2 ) } "even number array";
+      get_data_array
+      set_data_array
+      get_data_hash
+      set_data_hash
+      get_data_value
+      set_data_value
+   )
+);
 
-# hash
-lives_ok { new My::Objects::Exe( k1 => "v1", k2 => "v2" ) } "hash";
-
+# object is class
+isa_ok( new My::Objects::Exe(), "My::Objects::Exe" );
 
 done_testing();
 

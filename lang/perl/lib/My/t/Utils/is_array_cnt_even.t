@@ -10,8 +10,10 @@ use Test::Exception;
 use FindBin;
 use File::Basename;
 
-use lib "$FindBin::Bin/../../../../../lib";
-use My::Objects::Exe;
+use lib "$FindBin::Bin/../../../../lib";
+use My::Utils qw(
+   is_array_cnt_even
+);
 
 my $SCRIPT = basename( $0 );
 my $DATA_DIR = $FindBin::Bin . "/" . ${SCRIPT} . ".data";
@@ -22,18 +24,15 @@ my $DATA_DIR = $FindBin::Bin . "/" . ${SCRIPT} . ".data";
 #
 ###############################################################
 
+# array is odd
+is( is_array_cnt_even( 1 ), 0, "array, odd number" );
 
-# empty new
-lives_ok { new My::Objects::Exe() } "empty new ";
+# array is even
+is( is_array_cnt_even( 1, 2 ), 1, "array, even number" );
 
-# single item array
-throws_ok { new My::Objects::Exe( 1 ) } qr/Args is not a hash/, "single item array";
-
-# even number array
-lives_ok { new My::Objects::Exe( 1, 2 ) } "even number array";
-
-# hash
-lives_ok { new My::Objects::Exe( k1 => "v1", k2 => "v2" ) } "hash";
+# hash passed
+my %hash = ( k1 => "v1", k2 => "v2" );
+is( is_array_cnt_even( %hash ), 1, "hash" );
 
 
 done_testing();

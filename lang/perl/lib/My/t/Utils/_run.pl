@@ -13,6 +13,7 @@ my @tests = qw(
    get_file_list.t
    get_filesys_list.t
    grepi_array.t
+   is_array_cnt_even.t
    is_empty.t
    is_non_empty.t
    ltrim.t
