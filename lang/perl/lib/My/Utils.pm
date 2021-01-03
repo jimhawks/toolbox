@@ -18,6 +18,7 @@ our @EXPORT = qw(
    get_cmd_line_options
    get_dir_list
    get_file_list
+   get_file_list_for_patterns
    get_filesys_list
    grepi_array
    is_array_cnt_even
@@ -28,6 +29,10 @@ our @EXPORT = qw(
    read_file
    rtrim
    trim
+   verify_dir_exists
+   verify_dir_is_readable
+   verify_file_exists
+   verify_file_is_readable
 );
 
 #### tbd
@@ -149,14 +154,32 @@ sub get_file_list
    return( @file_list );
 }
 
+sub get_file_list_for_patterns
+{
+   my $dir      = nvl( shift, "");
+   my @patterns = @_;
+
+   verify_dir_is_readable( $dir );
+
+   my @files = ();
+   for (1..30)
+   {
+      foreach my $pattern( @patterns )
+      {
+         push( @files, glob "$dir/$pattern" );
+      }
+
+      $dir .= "/*";
+   }
+
+   return( sort @files );
+}
+
 sub get_filesys_list
 {
    my $dir = nvl( shift, "");
 
-   is_non_empty( $dir ) or die "ERROR. Dir name is empty";
-   -e $dir or die "ERROR. Dir not found. dir=[$dir]";
-   -d $dir or die "ERROR. Dir is not a dir. dir=[$dir]";
-   -r $dir or die "ERROR. Dir is not readable. dir=[$dir]";
+   verify_dir_is_readable( $dir );
 
    @_gfl_file_list = ();
    find( { wanted => \&_gfl_wanted }, $dir );
@@ -244,12 +267,9 @@ sub read_file
 {
    my $file = nvl( shift, "" );
 
-   is_non_empty( $file ) or die "ERROR. Filename is empty";
-   -e $file or die "ERROR. File not found. file=[$file]";
-   -f $file or die "ERROR. File is not a file. file=[$file]";
-   -r $file or die "ERROR. File is not readable. file=[$file]";
+   verify_file_is_readable( $file );
 
-   open( my $FH, "<", $file ) or die "ERROR. Cannot open file";
+   open( my $FH, "<", $file ) or confess "ERROR. Cannot open file";
    my @lines = <$FH>;
    close( $FH );
 
@@ -267,6 +287,43 @@ sub rtrim
 sub trim
 {
    return( rtrim( ltrim( @_ ) ) );
+}
+
+sub verify_dir_exists
+{
+   my $dir = nvl( shift, "");
+
+   is_non_empty( $dir ) or confess "ERROR. Dir name is empty";
+   -e $dir or confess "ERROR. Dir not found. dir=[$dir]";
+   -d $dir or confess "ERROR. Dir is not a dir. dir=[$dir]";
+}
+
+sub verify_dir_is_readable
+{
+   my $dir = nvl( shift, "");
+
+   verify_dir_exists( $dir );
+
+   -r $dir or confess "ERROR. Dir is not readable. dir=[$dir]";
+}
+
+sub verify_file_exists
+{
+   my $file = nvl( shift, "" );
+
+   is_non_empty( $file ) or confess "ERROR. Filename is empty";
+   -e $file or confess "ERROR. File not found. file=[$file]";
+   -f $file or confess "ERROR. File is not a file. file=[$file]";
+
+}
+
+sub verify_file_is_readable
+{
+   my $file = nvl( shift, "" );
+
+   verify_file_exists( $file );
+
+   -r $file or confess "ERROR. File is not readable. file=[$file]";
 }
 
 1;

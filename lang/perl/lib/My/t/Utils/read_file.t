@@ -29,28 +29,6 @@ my @got    = ();
 my $file   = "";
 
 
-# undef filename
-$file = undef;
-throws_ok { read_file( $file ) } qr/Filename is empty/, "undef filename";
-
-# empty filename
-$file = "";
-throws_ok { read_file( $file ) } qr/Filename is empty/, "empty filename";
-
-# file doesn't exist
-$file = "$DATA_DIR/file_not_found";
-throws_ok { read_file( $file ) } qr/File not found/, "filename doesnt exist";
-
-# file is a dir
-$file = "$DATA_DIR/file_is_dir";
-throws_ok { read_file( $file ) } qr/File is not a file/, "file is dir";
-
-# file is not readable
-$file = "$DATA_DIR/file_not_readable";
-chmod 0220, $file;
-throws_ok { read_file( $file ) } qr/File is not readable/, "file not readable";
-chmod 0664, $file;
-
 # file is empty
 $file = "$DATA_DIR/empty_file";
 @expect = ();

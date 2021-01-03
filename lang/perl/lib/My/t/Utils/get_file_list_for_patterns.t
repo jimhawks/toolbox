@@ -4,23 +4,17 @@ use strict;
 use warnings;
 use Data::Dumper;
 
+use Test::More;
+
 use FindBin;
-use File::Basename;
 
 use lib "$FindBin::Bin/../../../../lib";
 use My::Utils qw(
-   read_file
+   get_file_list_for_patterns
 );
 
-my $SCRIPT = basename( $0 );
+is ( 1, 2, "tbd" );
 
-myf1();
-
+done_testing();
 
 exit 0;
-
-sub myf1
-{
-   read_file("bogusfile");
-}
-

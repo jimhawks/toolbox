@@ -31,28 +31,6 @@ my $dir      = "";
 my $curr_dir = "";
 
 
-# undef dirname
-$dir = undef;
-throws_ok { get_filesys_list( $dir ) } qr/Dir name is empty/, "undef dir name";
-
-# empty dirname
-$dir = "";
-throws_ok { get_filesys_list( $dir ) } qr/Dir name is empty/, "empty dir name";
-
-# dir doesn't exist
-$dir = "$DATA_DIR/dir_not_found";
-throws_ok { get_filesys_list( $dir ) } qr/Dir not found/, "dir doesnt exist";
-
-# dir is a file
-$dir = "$DATA_DIR/dir_is_file";
-throws_ok { get_filesys_list( $dir ) } qr/Dir is not a dir/, "dir is file";
-
-# dir is not readable
-$dir = "$DATA_DIR/dir_not_readable";
-chmod 0331, $dir;
-throws_ok { get_filesys_list( $dir ) } qr/Dir is not readable/, "dir not readable";
-chmod 0775, $dir;
-
 # dir is empty
 $dir = "$DATA_DIR/empty_dir";
 mkdir $dir or die "ERROR. mkdir failed. dir=[$dir]";
