@@ -23,10 +23,12 @@ our @EXPORT = qw(
    grepi_array
    is_array_cnt_even
    is_empty
+   is_item_in_array
    is_non_empty
    ltrim
    nvl
    read_file
+   remove_array_duplicates
    rtrim
    trim
    verify_dir_exists
@@ -236,16 +238,47 @@ sub is_array_cnt_even
 
 sub is_empty
 {
-    my $str = shift;
-    my $rc = ( !defined( $str ) or length( $str ) == 0 ) ? 1 : 0;
-    return( $rc );
+   my $str = shift;
+   my $rc = ( !defined( $str ) or length( $str ) == 0 ) ? 1 : 0;
+   return( $rc );
+}
+
+sub is_item_in_array
+{
+   my $item = shift;
+   my @arr  = @_;
+
+   my $is_found = 0;
+   foreach my $element ( @arr )
+   {
+      if ( defined( $element ) and !defined ( $item ) )
+      {
+         next;
+      }
+      elsif ( !defined( $element ) and defined ( $item ) )
+      {
+         next;
+      }
+
+      if ( !defined( $element ) and !defined( $item ) )
+      {
+         $is_found = 1;
+         last;
+      }
+      elsif ( $element eq $item )
+      {
+         $is_found = 1;
+         last;
+      }
+   }
+   return( $is_found );
 }
 
 sub is_non_empty
 {
-    my $str = shift;
-    my $rc = ( defined( $str ) and length( $str ) > 0 ) ? 1 : 0;
-    return( $rc );
+   my $str = shift;
+   my $rc = ( defined( $str ) and length( $str ) > 0 ) ? 1 : 0;
+   return( $rc );
 }
 
 sub ltrim
@@ -274,6 +307,22 @@ sub read_file
    close( $FH );
 
    return( @lines );
+}
+
+sub remove_array_duplicates
+{
+   my @arr = @_;
+
+   my @new_arr = ();
+   foreach my $item ( @arr )
+   {
+      if ( !is_item_in_array( $item, @new_arr ) )
+      {
+         push( @new_arr, $item );
+      }
+   }
+
+   return( @new_arr );
 }
 
 sub rtrim

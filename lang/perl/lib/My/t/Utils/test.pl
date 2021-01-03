@@ -12,15 +12,14 @@ use My::Utils qw(
    read_file
 );
 
-my $SCRIPT = basename( $0 );
+my $var1 = "-22";
+my $var2 = -22;
 
-myf1();
+my $conv = 0;
+
+
 
 
 exit 0;
 
-sub myf1
-{
-   read_file("bogusfile");
-}
 

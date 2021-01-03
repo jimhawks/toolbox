@@ -15,6 +15,34 @@ use My::Utils qw(
 
 is ( 1, 2, "tbd" );
 
+# dir is empty
+   # 1 pattern
+   # 2 patterns
+
+# dir is non-empty
+   # 1 file
+      # 1 pattern
+         # file matches
+         # file doesn't match
+      # 2 patterns
+         # no pattern matches
+         # 1 pattern matches
+         # both patterns match
+   # multiple files
+      # 1 pattern
+         # pattern matches
+         # pattern doesn't match
+      # 2 patterns
+         # 1 pattern matches
+         # 2 patterns match
+            # subset overlap
+               # distinct
+               # intersect
+               # same
+       
+
+   
+
 done_testing();
 
 exit 0;
