@@ -173,6 +173,7 @@ sub get_file_list_for_patterns
 
       $dir .= "/*";
    }
+   @files = remove_array_duplicates( @files );
 
    return( sort @files );
 }

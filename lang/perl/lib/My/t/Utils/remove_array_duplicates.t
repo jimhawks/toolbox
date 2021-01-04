@@ -64,16 +64,38 @@ is_deeply( \@got, \@exp, "empty array" );
 
 # non-empty array
    # 1 element
+@arr = ( "a" );
+@got = remove_array_duplicates( @arr );
+@exp = ( "a" );
+is_deeply( \@got, \@exp, "1 element" );
+
    # multiple array elements
       # all unique
+@arr = ( "a", "b", "c" );
+@got = remove_array_duplicates( @arr );
+@exp = ( "a", "b", "c" );
+is_deeply( \@got, \@exp, "unique array" );
+
       # not unique
          # all elements are dupes
+@arr = ( "a", "a", "a" );
+@got = remove_array_duplicates( @arr );
+@exp = ( "a" );
+is_deeply( \@got, \@exp, "all are dupes" );
+
          # not all elements are dupes
             # 1 set of dupes
-            # 2 sets of dupes
+@arr = ( "a", "b", "a", "c" );
+@got = remove_array_duplicates( @arr );
+@exp = ( "a", "b", "c" );
+is_deeply( \@got, \@exp, "1 set of dupes" );
 
-is( 1, 2, "not finished" );
-   
+            # 2 sets of dupes
+@arr = ( "a", "b", "a", "c", "b" );
+@got = remove_array_duplicates( @arr );
+@exp = ( "a", "b", "c" );
+is_deeply( \@got, \@exp, "2 sets of dupes" );
+
 
 done_testing();
 
