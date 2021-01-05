@@ -39,6 +39,10 @@ is ( 1, 2, "tbd" );
                # distinct
                # intersect
                # same
+
+# files in subdirs
+   # matches
+   # no matches
        
 
    

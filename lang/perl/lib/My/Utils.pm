@@ -22,7 +22,9 @@ our @EXPORT = qw(
    get_filesys_list
    grepi_array
    is_array_cnt_even
+   is_array_empty
    is_empty
+   is_hash_empty
    is_item_in_array
    is_non_empty
    ltrim
@@ -237,11 +239,25 @@ sub is_array_cnt_even
    return( $cnt % 2 == 0 ? 1 : 0 );
 }
 
+sub is_array_empty
+{
+   my @arr = @_;
+
+   return( $#arr < 0 ? 1 : 0 );
+}
+
 sub is_empty
 {
    my $str = shift;
    my $rc = ( !defined( $str ) or length( $str ) == 0 ) ? 1 : 0;
    return( $rc );
+}
+
+sub is_hash_empty
+{
+   my %hash = @_;
+
+   return( is_array_empty( keys %hash ) ? 1 : 0 );
 }
 
 sub is_item_in_array

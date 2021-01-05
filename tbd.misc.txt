@@ -1,0 +1,22 @@
+- add grepi_file to perl utils
+- write daemon in 
+      perl, c, python, c++, c#
+- write app that uses msg queues (pipes)
+- rewrite perl lib in python
+- add docker stuff from udemy course
+- add to perl utils:
+      is_array_empty
+      is_hash_empty
+- perl logging package/object
+- write tree function in perl
+     dir
+     |- dir
+     |- dir
+        |- F file
+        |- F file
+        |- dir
+        |  |- F file
+        |- F file
+        |- dir
+
+
