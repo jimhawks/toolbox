@@ -2,6 +2,7 @@ package My::Utils;
 
 use strict;
 use warnings;
+use Data::Dumper;
 
 use Carp qw( cluck confess );
 use File::Find;
@@ -20,6 +21,7 @@ our @EXPORT = qw(
    get_file_list
    get_file_list_for_patterns
    get_filesys_list
+   get_random_number
    grepi_array
    is_array_cnt_even
    is_array_empty
@@ -190,6 +192,49 @@ sub get_filesys_list
    find( { wanted => \&_gfl_wanted }, $dir );
 
    return( sort @_gfl_file_list );
+}
+
+sub get_random_number
+{
+   my @args = @_;
+
+   my $min = 0;
+   my $max = 0;
+   my $num = 0;
+
+   $#args >= 0 or confess "ERROR. missing args";
+
+   # get args
+   if ( $#args == 0 )
+   {
+      $min = 0;
+      $max = int( $args[ 0 ] );
+   }
+   elsif ( $#args == 1 )
+   {
+      $min = int( $args[ 0 ] );
+      $max = int( $args[ 1 ] );
+   }
+
+   # error checking
+   $min >= 0 or confess "ERROR. Min is negative";
+   $max >= 0 or confess "ERROR. Max is negative";
+   $min <= $max or confess "ERROR. Max is less than min";
+
+   # special conditions
+   if ( $max == 0 )
+   {
+      return( 0 );
+   }
+   elsif ( $min == $max )
+   {
+      return( $min );
+   }
+
+   # get the number
+   $num = int( rand( $max - $min + 1 ) + $min );
+
+   return( $num );
 }
 
 sub grepi_array
