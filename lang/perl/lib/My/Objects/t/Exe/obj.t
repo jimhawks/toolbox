@@ -30,12 +30,12 @@ can_ok(
 
       get_args
       get_data
-      get_options
+      get_opts
 
       get_arg_array
       get_arg_value
-      get_option_array
-      get_option_value
+      get_opt_array
+      get_opt_value
 
       get_data_array
       set_data_array

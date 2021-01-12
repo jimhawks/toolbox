@@ -63,7 +63,7 @@ sub get_data
    );
 }
 
-sub get_options
+sub get_opts
 {
    my $self = shift;
 
@@ -125,11 +125,11 @@ sub set_data_value
 {
 }
 
-sub get_option_array
+sub get_opt_array
 {
 }
 
-sub get_option_value
+sub get_opt_value
 {
 }
 
@@ -214,7 +214,7 @@ sub _set_opt
 
    is_non_empty( $key ) or die "ERROR. Key is empty";
 
-   $self->get_options()->{ $key } = $value;
+   $self->get_opts()->{ $key } = $value;
 }
 
 
