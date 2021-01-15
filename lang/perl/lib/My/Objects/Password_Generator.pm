@@ -31,6 +31,26 @@ sub new
    return $self
 }
 
+sub get_dash_password
+{
+   my $self = shift;
+   my %args = @_;
+   
+   my $num_groups = nvl( $args{ num_groups }, 6 );
+   my $group_len  = nvl( $args{ group_len }, 5 );
+
+   my $grp_cnt = 0;
+   my $password = "";
+   while ( $grp_cnt < $num_groups )
+   {
+      my $str = $self->_get_random_str( $group_len );
+      $password .= ( length( $password ) == 0 ? "" : "-" ) . $str;
+      $grp_cnt++;
+   }
+
+   return( $password );
+}
+
 sub get_password
 {
    my $self = shift;
@@ -38,16 +58,8 @@ sub get_password
    my $max_len = nvl( shift, 60 );
 
    my $len = get_random_number( $min_len, $max_len );
+   my $passwd = $self->_get_random_str( $len );
 
-   my $passwd = "";
-   while( length( $passwd ) < $len )
-   {
-      my $char = $self->_get_random_char();
-      if ( is_non_empty( $char ) )
-      {
-         $passwd .= $char;
-      }
-   }
    return( $passwd );
 }
 
@@ -75,6 +87,12 @@ sub get_letters_setting
    return( $self->{ settings }->{ letters } );
 }
 
+sub get_lowercase_setting
+{
+   my $self = shift;
+   return( $self->{ settings }->{ lowercase } );
+}
+
 sub get_numbers_setting
 {
    my $self = shift;
@@ -93,6 +111,12 @@ sub get_symbols_setting
    return( $self->{ settings }->{ symbols } );
 }
 
+sub get_uppercase_setting
+{
+   my $self = shift;
+   return( $self->{ settings }->{ uppercase } );
+}
+
 
 #===============================================================
 #
@@ -107,11 +131,15 @@ sub _get_random_char
    my $sel  = get_random_number( 0, 3 );
    my $char = "";
 
-   if    ( $sel == 0 and $self->get_letters_setting() == 1 )
+   if    ( $sel == 0 
+            and $self->get_letters_setting() == 1 
+            and $self->get_lowercase_setting() == 1 )
    {
       $char = $self->_get_random_lowercase_letter();
    }
-   elsif ( $sel == 1 and $self->get_letters_setting() == 1 )
+   elsif ( $sel == 1 
+            and $self->get_letters_setting() == 1 
+            and $self->get_uppercase_setting() == 1 )
    {
       $char = $self->_get_random_uppercase_letter();
    }
@@ -127,13 +155,31 @@ sub _get_random_char
    return( $char );
 }
 
+sub _get_random_str
+{
+   my $self = shift;
+
+   my $len = shift;
+
+   my $str = "";
+   while( length( $str ) < $len )
+   {
+      my $char = $self->_get_random_char();
+      if ( is_non_empty( $char ) )
+      {
+         $str .= $char;
+      }
+   }
+   return( $str );
+}
+
 sub _get_random_digit
 {
    my $self = shift;
 
    my @arr = (
-      "0", # index 0
-      "1", # index 1
+      #"0", # index 0
+      #"1", # index 1
       "2", # index 2
       "3", # index 3
       "4", # index 4
@@ -267,9 +313,11 @@ sub _init_obj
    my %args = @_;
    
    # set settings
-   $self->{ settings }->{ letters } = nvl( $args{ letters },   1 );
-   $self->{ settings }->{ numbers } = nvl( $args{ numbers },   1 );
-   $self->{ settings }->{ symbols } = nvl( $args{ symbols },   1 );
+   $self->{ settings }->{ letters }   = nvl( $args{ letters },   1 );
+   $self->{ settings }->{ numbers }   = nvl( $args{ numbers },   1 );
+   $self->{ settings }->{ symbols }   = nvl( $args{ symbols },   1 );
+   $self->{ settings }->{ uppercase } = nvl( $args{ uppercase }, 1 );
+   $self->{ settings }->{ lowercase } = nvl( $args{ lowercase }, 1 );
 
    $self->{ settings }->{ seed }    = int( nvl( $args{ seed }, 0 ) );
 

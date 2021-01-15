@@ -82,6 +82,21 @@ sub get_opts
 
 sub get_arg_array
 {
+   my $self = shift;
+
+   my $key = shift;
+
+   is_non_empty( $key ) or die "ERROR. Key is empty";
+
+   if ( !exists( $self->get_args()->{ $key } ) )
+   {
+      $self->get_args()->{ $key } = [];
+   }
+
+   return( wantarray 
+           ? @{ $self->get_args()->{ $key } }
+           : $self->get_args()->{ $key } 
+   );
 }
 
 sub get_arg_value
@@ -103,34 +118,127 @@ sub get_arg_value
 
 sub get_data_array
 {
+   my $self = shift;
+
+   my $key = shift;
+
+   is_non_empty( $key ) or die "ERROR. Key is empty";
+
+   if ( !exists( $self->get_data()->{ $key } ) )
+   {
+      $self->get_data()->{ $key } = [];
+   }
+
+   return( wantarray 
+           ? @{ $self->get_data()->{ $key } }
+           : $self->get_data()->{ $key } 
+   );
 }
 
 sub set_data_array
 {
+   my $self = shift;
+
+   my $key = shift;
+   my @arr = @_;
+
+   is_non_empty( $key ) or die "ERROR. Key is empty";
+
+   $self->get_data()->{ $key } = \@arr;
 }
 
 sub get_data_hash
 {
+   my $self = shift;
+
+   my $key = shift;
+
+   is_non_empty( $key ) or die "ERROR. Key is empty";
+
+   if ( !exists( $self->get_data()->{ $key } ) )
+   {
+      $self->get_data()->{ $key } = { };
+   }
+
+   return( wantarray 
+           ? %{ $self->get_data()->{ $key } }
+           : $self->get_data()->{ $key } 
+   );
 }
 
 sub set_data_hash
 {
+   my $self = shift;
+
+   my $key  = shift;
+   my %hash = @_;
+
+   is_non_empty( $key ) or die "ERROR. Key is empty";
+
+   $self->get_data()->{ $key } = \%hash;
 }
 
 sub get_data_value
 {
+   my $self = shift;
+
+   my $key = shift;
+
+   is_non_empty( $key ) or die "ERROR. Key is empty";
+
+   if ( !exists( $self->get_data()->{ $key } ) )
+   {
+      $self->get_data()->{ $key } = "";
+   }
+
+   return( $self->get_data()->{ $key } );
 }
 
 sub set_data_value
 {
+   my $self = shift;
+
+   my $key   = shift;
+   my $value = shift;
+
+   is_non_empty( $key ) or die "ERROR. Key is empty";
+
+   $self->get_data()->{ $key } = $value;
 }
 
 sub get_opt_array
 {
+   my $self = shift;
+
+   my $key = shift;
+
+   is_non_empty( $key ) or die "ERROR. Key is empty";
+
+   if ( !exists( $self->get_opts()->{ $key } ) )
+   {
+      $self->get_opts()->{ $key } = [];
+   }
+
+   return( wantarray 
+           ? @{ $self->get_opts()->{ $key } }
+           : $self->get_opts()->{ $key } 
+   );
 }
 
 sub get_opt_value
 {
+   my $self = shift;
+
+   my $key = shift;
+
+   is_non_empty( $key ) or die "ERROR. Key is empty";
+
+   if ( !exists( $self->get_opts()->{ $key } ) )
+   {
+      $self->get_opts()->{ $key } = "";
+   }
+
+   return( $self->get_opts()->{ $key } );
 }
 
 
