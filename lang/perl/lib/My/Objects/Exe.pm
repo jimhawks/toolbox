@@ -5,8 +5,9 @@ use warnings;
 use Data::Dumper;
 
 use Carp qw( cluck confess );
+use FindBin;
 
-use lib "$FindBin::Bin/../../../../../lib";
+use lib "$FindBin::Bin/../../../../lib";
 use My::Utils qw(
    get_cmd_line_options
    is_array_cnt_even
@@ -261,18 +262,17 @@ sub _init_obj
    $args{ opt_spec } = nvl( $args{ opt_spec }, [] );
    $args{ arg_list } = nvl( $args{ arg_list }, [] );
 
-   # copy arg arrays to local arrays for easier use
-   my @opt_spec = @{ $args{ opt_spec } };
-   my @arg_list = @{ $args{ arg_list } };
+   # set options and args
+   $self->_init_set_options( @{ $args{ opt_spec } } );
+   $self->_init_set_args(    @{ $args{ arg_list } } );
 
-   # set options
-   my %options = get_cmd_line_options( @opt_spec );
-   foreach my $key ( sort keys %options )
-   {
-      $self->_set_opt( $key, $options{ $key } );
-   }
+}
 
-   # set args
+sub _init_set_args
+{
+   my $self = shift;
+   my @arg_list = @_;
+
    foreach my $arg ( @arg_list )
    {
       # process array arg
@@ -298,6 +298,49 @@ sub _init_obj
 
       # set arg
       $self->_set_arg( $arg, $value );
+   }
+}
+
+sub _init_set_options
+{
+   my $self = shift;
+   my @opt_spec = @_;
+
+   # create map of the short options to the long options
+   my %short_map = ();
+   foreach my $spec ( @opt_spec )
+   {
+      my ( $name, $other )  = split( /[:=]/, $spec );
+      my ( $lname, $sname ) = split( /\|/, $name );
+      if ( is_non_empty( $sname ) )
+      {
+         is_non_empty( $lname ) or confess "Lname is empty";
+         $short_map{ $sname } = $lname;
+      }
+   }
+   
+   # get options from cmd line
+   my %options = get_cmd_line_options( @opt_spec );
+
+   # copy short options to long options
+   my %options2 = ();
+   foreach my $key ( sort keys %options )
+   {
+      if ( exists( $short_map{ $key } ) )
+      {
+         my $long_name = $short_map{ $key } ;
+         is_non_empty( $long_name ) or confess "Long name is empty";
+         $options2{ $long_name }  = $options{ $key };
+         next;
+      }
+
+      $options2{ $key }  = $options{ $key };
+   }
+
+   # set option values in obj
+   foreach my $key ( sort keys %options2 )
+   {
+      $self->_set_opt( $key, $options{ $key } );
    }
 }
 

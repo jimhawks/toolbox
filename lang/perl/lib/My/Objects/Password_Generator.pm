@@ -7,6 +7,10 @@ use Data::Dumper;
 use Carp qw( cluck confess );
 
 use lib "$FindBin::Bin/../../../../../lib";
+use My::Constants qw(
+   $YES
+   $NO
+);
 use My::Utils qw(
    get_random_number
    is_array_cnt_even
@@ -14,9 +18,17 @@ use My::Utils qw(
    nvl
 );
 
+
+my $DEFAULT_MAX_PASSWORD_LEN = 10;
+my $DEFAULT_MIN_PASSWORD_LEN = 10;
+my $DEFAULT_NUM_PASSWORDS    = 1;
+
+my $DEFAULT_DASH_GROUP_LEN   = 5;
+my $DEFAULT_NUM_DASH_GROUPS  = 6;
+
 #===============================================================
 #
-# public
+# class - public
 #
 #===============================================================
 
@@ -31,13 +43,19 @@ sub new
    return $self
 }
 
+#===============================================================
+#
+# instance - public
+#
+#===============================================================
+
 sub get_dash_password
 {
    my $self = shift;
    my %args = @_;
    
-   my $num_groups = nvl( $args{ num_groups }, 6 );
-   my $group_len  = nvl( $args{ group_len }, 5 );
+   my $num_groups = nvl( $args{ num_groups }, $DEFAULT_NUM_DASH_GROUPS );
+   my $group_len  = nvl( $args{ group_len },  $DEFAULT_DASH_GROUP_LEN );
 
    my $grp_cnt = 0;
    my $password = "";
@@ -54,10 +72,20 @@ sub get_dash_password
 sub get_password
 {
    my $self = shift;
-   my $min_len = nvl( shift, 10 );
-   my $max_len = nvl( shift, 60 );
+   my @args = @_;
 
-   my $len = get_random_number( $min_len, $max_len );
+   my $len = 0;
+   if ( $#args == 0 ) # 1 arg
+   {
+      $len = shift @args;
+   }
+   else
+   {
+      my $min_len = nvl( shift @args, $DEFAULT_MIN_PASSWORD_LEN );
+      my $max_len = nvl( shift @args, $DEFAULT_MAX_PASSWORD_LEN );
+      $len = get_random_number( $min_len, $max_len );
+   }
+
    my $passwd = $self->_get_random_str( $len );
 
    return( $passwd );
@@ -67,7 +95,7 @@ sub get_passwords
 {
    my $self = shift;
 
-   my $num_passwords = nvl( shift, 1 );
+   my $num_passwords = nvl( pop, $DEFAULT_NUM_PASSWORDS );
    $num_passwords > 0 or confess "ERROR. Num passwords is 0 or negative";
 
    my @arr = ();
@@ -79,48 +107,10 @@ sub get_passwords
    return( @arr );
 }
 
-#---------------------------------------------------
-
-sub get_letters_setting
-{
-   my $self = shift;
-   return( $self->{ settings }->{ letters } );
-}
-
-sub get_lowercase_setting
-{
-   my $self = shift;
-   return( $self->{ settings }->{ lowercase } );
-}
-
-sub get_numbers_setting
-{
-   my $self = shift;
-   return( $self->{ settings }->{ numbers } );
-}
-
-sub get_seed_setting
-{
-   my $self = shift;
-   return( $self->{ settings }->{ seed } );
-}
-
-sub get_symbols_setting
-{
-   my $self = shift;
-   return( $self->{ settings }->{ symbols } );
-}
-
-sub get_uppercase_setting
-{
-   my $self = shift;
-   return( $self->{ settings }->{ uppercase } );
-}
-
 
 #===============================================================
 #
-# private
+# instance - private
 #
 #===============================================================
 
@@ -132,22 +122,22 @@ sub _get_random_char
    my $char = "";
 
    if    ( $sel == 0 
-            and $self->get_letters_setting() == 1 
-            and $self->get_lowercase_setting() == 1 )
+            and $self->get_letters_setting()   eq $YES 
+            and $self->get_lowercase_setting() eq $YES )
    {
       $char = $self->_get_random_lowercase_letter();
    }
    elsif ( $sel == 1 
-            and $self->get_letters_setting() == 1 
-            and $self->get_uppercase_setting() == 1 )
+            and $self->get_letters_setting()   eq $YES 
+            and $self->get_uppercase_setting() eq $YES )
    {
       $char = $self->_get_random_uppercase_letter();
    }
-   elsif ( $sel == 2 and $self->get_numbers_setting() == 1 )
+   elsif ( $sel == 2 and $self->get_numbers_setting() eq $YES )
    {
       $char = $self->_get_random_digit();
    }
-   elsif ( $sel == 3 and $self->get_symbols_setting() == 1 )
+   elsif ( $sel == 3 and $self->get_symbols_setting() eq $YES )
    {
       $char = $self->_get_random_symbol();
    }
@@ -313,17 +303,113 @@ sub _init_obj
    my %args = @_;
    
    # set settings
-   $self->{ settings }->{ letters }   = nvl( $args{ letters },   1 );
-   $self->{ settings }->{ numbers }   = nvl( $args{ numbers },   1 );
-   $self->{ settings }->{ symbols }   = nvl( $args{ symbols },   1 );
-   $self->{ settings }->{ uppercase } = nvl( $args{ uppercase }, 1 );
-   $self->{ settings }->{ lowercase } = nvl( $args{ lowercase }, 1 );
+   $self->_set_letters_setting(   nvl( $args{ letters },   $YES ) );
+   $self->_set_numbers_setting(   nvl( $args{ numbers },   $YES ) );
+   $self->_set_symbols_setting(   nvl( $args{ symbols },   $YES ) );
+   $self->_set_uppercase_setting( nvl( $args{ uppercase }, $YES ) );
+   $self->_set_lowercase_setting( nvl( $args{ lowercase }, $YES ) );
+}
 
-   $self->{ settings }->{ seed }    = int( nvl( $args{ seed }, 0 ) );
+#---------------------------------------------------
+#
+# getters/setters - public
+#
+#---------------------------------------------------
 
-   # check ranges
-   $self->{ settings }->{ seed } >= 0 or confess "Seed is a negative number";
-   
+sub get_letters_setting
+{
+   my $self = shift;
+   return( $self->{ settings }->{ letters } );
+}
+
+sub get_lowercase_setting
+{
+   my $self = shift;
+   return( $self->{ settings }->{ lowercase } );
+}
+
+sub get_numbers_setting
+{
+   my $self = shift;
+   return( $self->{ settings }->{ numbers } );
+}
+
+sub get_symbols_setting
+{
+   my $self = shift;
+   return( $self->{ settings }->{ symbols } );
+}
+
+sub get_uppercase_setting
+{
+   my $self = shift;
+   return( $self->{ settings }->{ uppercase } );
+}
+
+#---------------------------------------------------
+#
+# getters/setters - private
+#
+#---------------------------------------------------
+
+sub _set_letters_setting
+{
+   my $self = shift;
+   my $value = shift;
+
+   is_non_empty( $value ) or confess "Value is empty";
+   $value eq $YES or $value eq $NO 
+      or confess "Value is invalid. value=[$value]";
+
+   $self->{ settings }->{ letters } = $value;
+}
+
+sub _set_lowercase_setting
+{
+   my $self = shift;
+   my $value = shift;
+
+   is_non_empty( $value ) or confess "Value is empty";
+   $value eq $YES or $value eq $NO 
+      or confess "Value is invalid. value=[$value]";
+
+   $self->{ settings }->{ lowercase } = $value;
+}
+
+sub _set_numbers_setting
+{
+   my $self = shift;
+   my $value = shift;
+
+   is_non_empty( $value ) or confess "Value is empty";
+   $value eq $YES or $value eq $NO 
+      or confess "Value is invalid. value=[$value]";
+
+   $self->{ settings }->{ numbers } = $value;
+}
+
+sub _set_symbols_setting
+{
+   my $self = shift;
+   my $value = shift;
+
+   is_non_empty( $value ) or confess "Value is empty";
+   $value eq $YES or $value eq $NO 
+      or confess "Value is invalid. value=[$value]";
+
+   $self->{ settings }->{ symbols } = $value;
+}
+
+sub _set_uppercase_setting
+{
+   my $self = shift;
+   my $value = shift;
+
+   is_non_empty( $value ) or confess "Value is empty";
+   $value eq $YES or $value eq $NO 
+      or confess "Value is invalid. value=[$value]";
+
+   $self->{ settings }->{ uppercase } = $value;
 }
 
 

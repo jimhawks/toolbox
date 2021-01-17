@@ -12,6 +12,10 @@ use File::Basename;
 
 use lib "$FindBin::Bin/../../../../../lib";
 use My::Objects::Password_Generator;
+use My::Constants qw(
+   $YES
+   $NO
+);
 
 my $SCRIPT = basename( $0 );
 my $DATA_DIR = $FindBin::Bin . "/" . ${SCRIPT} . ".data";
@@ -27,19 +31,19 @@ my $obj = "";
 # default value
 $obj = new My::Objects::Password_Generator(
 );
-is( $obj->get_letters_setting(), 1, "use default" );
+is( $obj->get_letters_setting(), $YES, "use default" );
 
 # set to true
 $obj = new My::Objects::Password_Generator(
-   letters => 1,
+   letters => $YES,
 );
-is( $obj->get_letters_setting(), 1, "set to true" );
+is( $obj->get_letters_setting(), $YES, "set to true" );
 
 # set to false
 $obj = new My::Objects::Password_Generator(
-   letters => 0,
+   letters => $NO,
 );
-is( $obj->get_letters_setting(), 0, "set to false" );
+is( $obj->get_letters_setting(), $NO, "set to false" );
 
 
 done_testing();

@@ -12,6 +12,10 @@ use File::Basename;
 
 use lib "$FindBin::Bin/../../../../../lib";
 use My::Objects::Password_Generator;
+use My::Constants qw(
+   $YES
+   $NO
+);
 
 my $SCRIPT = basename( $0 );
 my $DATA_DIR = $FindBin::Bin . "/" . ${SCRIPT} . ".data";
@@ -30,10 +34,10 @@ lives_ok { new My::Objects::Password_Generator() } "empty new ";
 # all options
 lives_ok { 
    new My::Objects::Password_Generator(
-      symbols     => 0,
-      numbers     => 0,
-      letters     => 0,
-      dash_groups => 1, 
+      symbols     => $NO,
+      numbers     => $NO,
+      letters     => $NO,
+      dash_groups => $YES, 
       num_groups  => 6,
       seed        => 12345,
    ) 

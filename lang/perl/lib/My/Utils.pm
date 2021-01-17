@@ -6,8 +6,15 @@ use Data::Dumper;
 
 use Carp qw( cluck confess );
 use File::Find;
+use FindBin;
 use Getopt::Long;
 Getopt::Long::Configure( "pass_through" );
+
+use lib "$FindBin::Bin/../../../lib";
+use My::Constants qw(
+   $TRUE
+   $FALSE
+);
 
 no warnings "File::Find";
 
@@ -95,7 +102,7 @@ sub get_cmd_line_options
    # input:  [array] options spec array
    # output: [hash] hash of options
 
-   my @optionsSpec = @_;
+   my @options_spec = @_;
          # url:  https://perldoc.perl.org/Getopt::Long
          #
          # summary
@@ -122,8 +129,7 @@ sub get_cmd_line_options
          #
 
    my %options = ();
-
-   GetOptions( \%options, @optionsSpec ) or confess "ERROR... get options failed.";
+   GetOptions( \%options, @options_spec ) or confess "ERROR... get options failed.";
 
    return( %options );
 }
@@ -200,7 +206,6 @@ sub get_random_number
 
    my $min = 0;
    my $max = 0;
-   my $num = 0;
 
    $#args >= 0 or confess "ERROR. missing args";
 
@@ -217,8 +222,8 @@ sub get_random_number
    }
 
    # error checking
-   $min >= 0 or confess "ERROR. Min is negative";
-   $max >= 0 or confess "ERROR. Max is negative";
+   $min >= 0    or confess "ERROR. Min is negative";
+   $max >= 0    or confess "ERROR. Max is negative";
    $min <= $max or confess "ERROR. Max is less than min";
 
    # special conditions
@@ -232,7 +237,7 @@ sub get_random_number
    }
 
    # get the number
-   $num = int( rand( $max - $min + 1 ) + $min );
+   my $num = int( rand( $max - $min + 1 ) + $min );
 
    return( $num );
 }

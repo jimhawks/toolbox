@@ -1,4 +1,4 @@
-#!/usr/bin/perl -d
+#!/usr/bin/perl
 
 use strict;
 use warnings;
@@ -10,36 +10,22 @@ use lib "$FindBin::Bin/../../../../../lib";
 use My::Objects::Exe;
 
 my $obj = "";
-my %exp = ();
-my %got = ();
-
-my @exp_argv = ();
-
-my @opt_spec = ();
 my @arg_list = ();
+my @opt_spec = ();
 
 # skip unprocessed options
 @arg_list = qw(
-   arg1
-   arg2
 );
 @opt_spec = qw(
-   opt1=s
+   opt1|a=s
+   opt2|b:s
+   opt3|c
 );
-@ARGV = qw(
-   -opt1=value1
-   -opt2=value2
-   str1
-   str2
-   str3
-);
+#@ARGV = qw( --opt1=v1 --opt2=v2 --opt3 );
+@ARGV = qw( -a=v1 -b=v2 -c );
 $obj  = new My::Objects::Exe( arg_list => \@arg_list, opt_spec => \@opt_spec );
-%got  = $obj->get_args();
-%exp  = (
-   arg1 => "str1",
-   arg2 => "str2",
-);
-@exp_argv = ( "str3" );
+
+print Dumper( \$obj );
 
 exit 0;
 
