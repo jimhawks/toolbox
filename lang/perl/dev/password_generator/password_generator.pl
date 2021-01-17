@@ -1,4 +1,4 @@
-#!/usr/bin/perl -d
+#!/usr/bin/perl 
 
 use strict;
 use warnings;
@@ -9,6 +9,7 @@ use Data::Dumper;
 # modules - system
 #
 #--------------------------------------------------
+use Carp qw( cluck confess );
 use FindBin;
 
 #--------------------------------------------------
@@ -16,12 +17,17 @@ use FindBin;
 # modules - custom
 #
 #--------------------------------------------------
-use lib "$FindBin::Bin/../../../../../lib";
+use lib "$FindBin::Bin/../../lib";
 use My::Objects::Exe;
 use My::Objects::Password_Generator;
 use My::Constants qw(
+   $TRUE
+   $FALSE
    $YES
    $NO
+);
+use My::Utils qw(
+   nvl
 );
 
 #--------------------------------------------------
@@ -33,13 +39,13 @@ my $exe = "";
 my @arg_list = qw(
 );
 my @opt_spec = qw(
-   letters|l=s
-   symbols|s=s
-   numbers|n=s
-   lowercase|w=s
-   uppercase|u=s
-   dash_group|d=s
-   num_passwords|p=i
+   no_letters|l
+   no_symbols|s
+   no_numbers|n
+   no_lowercase|lc
+   no_uppercase|uc
+   dash_group|dg
+   num_passwords|np=i
 );
 
 my $pgen = "";
@@ -67,29 +73,49 @@ sub init
 {
    $exe = new My::Objects::Exe( arg_list => \@arg_list, opt_spec => \@opt_spec );
 
+   my $use_letters   = nvl( get_no_letters_opt(),   $FALSE ) == $FALSE ? $YES : $NO;
+   my $use_numbers   = nvl( get_no_numbers_opt(),   $FALSE ) == $FALSE ? $YES : $NO;
+   my $use_symbols   = nvl( get_no_symbols_opt(),   $FALSE ) == $FALSE ? $YES : $NO;
+   my $use_uppercase = nvl( get_no_uppercase_opt(), $FALSE ) == $FALSE ? $YES : $NO;
+   my $use_lowercase = nvl( get_no_lowercase_opt(), $FALSE ) == $FALSE ? $YES : $NO;
+
    $pgen = new My::Objects::Password_Generator(
-              letters    => get_letters_opt(),
-              numbers    => get_numbers_opt(),
-              symbols    => get_symbols_opt(),
-              uppercase  => get_uppercase_opt(),
-              lowercase  => get_lowercase_opt(),
+              letters    => $use_letters,
+              numbers    => $use_numbers,
+              symbols    => $use_symbols,
+              uppercase  => $use_uppercase,
+              lowercase  => $use_lowercase,
            );
 }
 
 sub main
 {
-   
-   
-   if ( $exe->get_dash_group_opt() eq $YES )
+   my $num_passwords = nvl( get_num_passwords_opt(), 1 );
+
+   my @passwords = ();
+   if ( nvl( get_dash_group_opt(), $FALSE ) == $TRUE )
    {
-      $exe->set_num_groups( $exe->get_arg1_arg() );
-      $exe->set_group_len(  $exe->get_arg2_arg() );
+      my $num_groups = shift @ARGV;
+      my $group_len  = shift @ARGV;
+      @passwords = $pgen->get_dash_passwords( 
+         num_groups    => $num_groups,
+         group_len     => $group_len,
+         num_passwords => $num_passwords,
+      );
    }
    else
    {
-      $exe->set_num_groups( $exe->get_arg1_arg() );
-      $exe->set_group_len(  $exe->get_arg2_arg() );
+      my $max_password_len = pop @ARGV;
+      my $min_password_len = nvl( pop @ARGV, $max_password_len );
+
+      @passwords = $pgen->get_passwords( 
+         min_len       => $min_password_len,
+         max_len       => $max_password_len,
+         num_passwords => $num_passwords,
+      );
    }
+
+   print join( "\n", @passwords ) . "\n";
 }
 
 sub term
@@ -101,7 +127,17 @@ sub term
 # functions - others
 #
 #--------------------------------------------------
+sub convert_truefalse_opt_to_yesno
+{
+   my $self = shift;
 
+   my $value = shift;
+
+   $value = nvl( $value, $FALSE );
+   $value == $TRUE or $value == $FALSE or confess "Value is not true or false";
+
+   return( $value == $TRUE ? $YES : $NO );
+}
 
 #--------------------------------------------------
 #
@@ -111,37 +147,37 @@ sub term
 
 sub get_dash_group_opt
 {
-   return( $exe->get_opt_value( "dash_group" );
+   return( $exe->get_opt_value( "dash_group" ) );
 }
 
-sub get_letters_opt
+sub get_no_letters_opt
 {
-   return( $exe->get_opt_value( "letters" );
+   return( $exe->get_opt_value( "no_letters" ) );
 }
 
-sub get_lowercase_opt
+sub get_no_lowercase_opt
 {
-   return( $exe->get_opt_value( "lowercase" );
+   return( $exe->get_opt_value( "no_lowercase" ) );
 }
 
-sub get_numbers_opt
+sub get_no_numbers_opt
 {
-   return( $exe->get_opt_value( "numbers" );
+   return( $exe->get_opt_value( "no_numbers" ) );
 }
 
-sub get_symbols_opt
+sub get_no_symbols_opt
 {
-   return( $exe->get_opt_value( "symbols" );
+   return( $exe->get_opt_value( "no_symbols" ) );
 }
 
-sub get_uppercase_opt
+sub get_no_uppercase_opt
 {
-   return( $exe->get_opt_value( "uppercase" );
+   return( $exe->get_opt_value( "no_uppercase" ) );
 }
 
 sub get_num_passwords_opt
 {
-   return( $exe->get_opt_value( "num_passwords" );
+   return( $exe->get_opt_value( "num_passwords" ) );
 }
 
 #--------------------------------------------------
@@ -156,46 +192,6 @@ sub get_num_passwords_opt
 # getters/setters - exe - data
 #
 #--------------------------------------------------
-
-sub get_group_len
-{
-   return( $exe->get_data_value( "group_len" );
-}
-
-sub set_group_len
-{
-   $exe->set_data_value( "group_len", @_ );
-}
-
-sub get_max_password_len
-{
-   return( $exe->get_data_value( "max_password_len" );
-}
-
-sub set_max_password_len
-{
-   $exe->set_data_value( "max_password_len", @_ );
-}
-
-sub get_min_password_len
-{
-   return( $exe->get_data_value( "min_password_len" );
-}
-
-sub set_min_password_len
-{
-   $exe->set_data_value( "min_password_len", @_ );
-}
-
-sub get_num_groups
-{
-   return( $exe->get_data_value( "num_groups" );
-}
-
-sub set_num_groups
-{
-   $exe->set_data_value( "num_groups", @_ );
-}
 
 exit 0;
 

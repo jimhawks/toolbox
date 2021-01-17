@@ -217,8 +217,9 @@ sub get_opt_array
 
    if ( !exists( $self->get_opts()->{ $key } ) )
    {
-      $self->get_opts()->{ $key } = [];
+      $self->get_opts()->{ $key } = undef;
    }
+   defined( $self->get_opts()->{ $key } ) or return( undef );
 
    return( wantarray 
            ? @{ $self->get_opts()->{ $key } }
@@ -236,7 +237,7 @@ sub get_opt_value
 
    if ( !exists( $self->get_opts()->{ $key } ) )
    {
-      $self->get_opts()->{ $key } = "";
+      $self->get_opts()->{ $key } = undef; 
    }
 
    return( $self->get_opts()->{ $key } );

@@ -22,7 +22,7 @@ my @opt_spec = ();
    opt3|c
 );
 #@ARGV = qw( --opt1=v1 --opt2=v2 --opt3 );
-@ARGV = qw( -a=v1 -b=v2 -c );
+@ARGV = qw( -a=v1 -b= -c );
 $obj  = new My::Objects::Exe( arg_list => \@arg_list, opt_spec => \@opt_spec );
 
 print Dumper( \$obj );

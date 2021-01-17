@@ -8,20 +8,24 @@ use FindBin;
 
 use lib "$FindBin::Bin/../../../../../lib";
 use My::Objects::Password_Generator;
-
-my $obj = new My::Objects::Password_Generator(
-   symbols   => "n", # default: TRUE
-   numbers   => "y", # default: TRUE
-   letters   => "y", # default: TRUE
-   lowercase => "n", # default: TRUE
-   uppercase => "y", # default: TRUE
-#   seed       => 12345,  # default: 0
+use My::Constants qw(
+   $YES
+   $NO
 );
 
-print "passwd=[" . $obj->get_password( 34 ) . "]\n";
+my $obj = new My::Objects::Password_Generator(
+   symbols   => $NO,  # default: TRUE
+   numbers   => $YES, # default: TRUE
+   letters   => $YES, # default: TRUE
+   lowercase => $NO,  # default: TRUE
+   uppercase => $YES, # default: TRUE
+);
 
-print Dumper( $obj->get_passwords( 20, 30, 3 ) );
+print Dumper( $obj->get_passwords( len => 34, num_passwords => 3 ) );
+print "\n\n";
+print Dumper( $obj->get_dash_passwords( group_len => 3, num_groups => 4 ) );
 
-print "dash=[" . $obj->get_dash_password() . "]\n";
+#print "passwd=[" . $obj->get_password( 34 ) . "]\n";
+#print "dash=[" . $obj->get_dash_password() . "]\n";
 exit 0;
 

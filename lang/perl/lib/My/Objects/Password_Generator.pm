@@ -69,21 +69,38 @@ sub get_dash_password
    return( $password );
 }
 
+sub get_dash_passwords
+{
+   my $self = shift;
+   my %args = @_;
+
+   my $num_passwords = nvl( $args{ num_passwords }, $DEFAULT_NUM_PASSWORDS );
+   $num_passwords > 0 or confess "ERROR. Num passwords is 0 or negative";
+
+   my @arr = ();
+   foreach ( 1 .. $num_passwords )
+   {
+      push( @arr, $self->get_dash_password( %args ) );
+   }
+
+   return( @arr );
+}
+
 sub get_password
 {
    my $self = shift;
-   my @args = @_;
+   my %args = @_;
 
    my $len = 0;
-   if ( $#args == 0 ) # 1 arg
+   if ( is_non_empty( $args{ len } ) )
    {
-      $len = shift @args;
+      $len = $args{ len };
    }
-   else
+   else 
    {
-      my $min_len = nvl( shift @args, $DEFAULT_MIN_PASSWORD_LEN );
-      my $max_len = nvl( shift @args, $DEFAULT_MAX_PASSWORD_LEN );
-      $len = get_random_number( $min_len, $max_len );
+      my $min_len = nvl( $args{ min_len }, $DEFAULT_MIN_PASSWORD_LEN );
+      my $max_len = nvl( $args{ max_len }, $DEFAULT_MAX_PASSWORD_LEN );
+      $len        = get_random_number( $min_len, $max_len );
    }
 
    my $passwd = $self->_get_random_str( $len );
@@ -94,14 +111,15 @@ sub get_password
 sub get_passwords
 {
    my $self = shift;
+   my %args = @_;
 
-   my $num_passwords = nvl( pop, $DEFAULT_NUM_PASSWORDS );
+   my $num_passwords = nvl( $args{ num_passwords }, $DEFAULT_NUM_PASSWORDS );
    $num_passwords > 0 or confess "ERROR. Num passwords is 0 or negative";
 
    my @arr = ();
    foreach ( 1 .. $num_passwords )
    {
-      push( @arr, $self->get_password( @_ ) );
+      push( @arr, $self->get_password( %args ) );
    }
 
    return( @arr );
@@ -238,7 +256,7 @@ sub _get_random_symbol
       "*",  # index 8
       "(",  # index 9
       ")",  # index 10
-      "-",  # index 11
+      #"-",  # index 11
       "_",  # index 12
       "=",  # index 13
       "+",  # index 14
