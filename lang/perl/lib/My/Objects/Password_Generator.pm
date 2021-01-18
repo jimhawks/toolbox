@@ -26,6 +26,8 @@ my $DEFAULT_NUM_PASSWORDS    = 1;
 my $DEFAULT_DASH_GROUP_LEN   = 5;
 my $DEFAULT_NUM_DASH_GROUPS  = 6;
 
+my $DEFAULT_DATA_DIR         = "$ENV{ HOME }/.pgen";
+
 #===============================================================
 #
 # class - public
@@ -49,7 +51,58 @@ sub new
 #
 #===============================================================
 
-sub get_dash_password
+sub get_dash_passwords
+{
+   my $self = shift;
+   my %args = @_;
+
+   my $num_passwords = nvl( $args{ num_passwords }, $DEFAULT_NUM_PASSWORDS );
+   $num_passwords > 0 or confess "ERROR. Num passwords is 0 or negative";
+
+   my @arr = ();
+   foreach ( 1 .. $num_passwords )
+   {
+      push( @arr, $self->_get_dash_password( %args ) );
+   }
+
+   if ( $self->get_write_history_setting() eq $YES )
+   {
+      $self->_write_history( @arr );
+   }
+
+   return( @arr );
+}
+
+sub get_passwords
+{
+   my $self = shift;
+   my %args = @_;
+
+   my $num_passwords = nvl( $args{ num_passwords }, $DEFAULT_NUM_PASSWORDS );
+   $num_passwords > 0 or confess "ERROR. Num passwords is 0 or negative";
+
+   my @arr = ();
+   foreach ( 1 .. $num_passwords )
+   {
+      push( @arr, $self->_get_password( %args ) );
+   }
+
+   if ( $self->get_write_history_setting() eq $YES )
+   {
+      $self->_write_history( @arr );
+   }
+
+   return( @arr );
+}
+
+
+#===============================================================
+#
+# instance - private
+#
+#===============================================================
+
+sub _get_dash_password
 {
    my $self = shift;
    my %args = @_;
@@ -69,24 +122,7 @@ sub get_dash_password
    return( $password );
 }
 
-sub get_dash_passwords
-{
-   my $self = shift;
-   my %args = @_;
-
-   my $num_passwords = nvl( $args{ num_passwords }, $DEFAULT_NUM_PASSWORDS );
-   $num_passwords > 0 or confess "ERROR. Num passwords is 0 or negative";
-
-   my @arr = ();
-   foreach ( 1 .. $num_passwords )
-   {
-      push( @arr, $self->get_dash_password( %args ) );
-   }
-
-   return( @arr );
-}
-
-sub get_password
+sub _get_password
 {
    my $self = shift;
    my %args = @_;
@@ -107,30 +143,6 @@ sub get_password
 
    return( $passwd );
 }
-
-sub get_passwords
-{
-   my $self = shift;
-   my %args = @_;
-
-   my $num_passwords = nvl( $args{ num_passwords }, $DEFAULT_NUM_PASSWORDS );
-   $num_passwords > 0 or confess "ERROR. Num passwords is 0 or negative";
-
-   my @arr = ();
-   foreach ( 1 .. $num_passwords )
-   {
-      push( @arr, $self->get_password( %args ) );
-   }
-
-   return( @arr );
-}
-
-
-#===============================================================
-#
-# instance - private
-#
-#===============================================================
 
 sub _get_random_char
 {
@@ -326,6 +338,38 @@ sub _init_obj
    $self->_set_symbols_setting(   nvl( $args{ symbols },   $YES ) );
    $self->_set_uppercase_setting( nvl( $args{ uppercase }, $YES ) );
    $self->_set_lowercase_setting( nvl( $args{ lowercase }, $YES ) );
+
+   $self->_set_write_history_setting( nvl( $args{ write_history }, $YES ) );
+   $self->_set_data_dir_setting(      nvl( $args{ data_dir }, $DEFAULT_DATA_DIR ) );
+}
+
+sub _write_history
+{
+   my $self = shift;
+
+   my @passwords = @_;
+
+   # create data dir if it doesn't exist
+   my $data_dir = $self->get_data_dir_setting();
+   if ( ! -e $data_dir )
+   {
+      mkdir $data_dir or confess "Unable to mkdir.  dir=[$data_dir]";
+   }
+   chmod 0700, $data_dir or confess "Unable to chmod dir. dir=[$data_dir]";
+   
+   # append to history file
+   my $history_file = "$data_dir/history.txt";
+   open( my $FH, ">>", $history_file ) 
+      or confess "Unable to open history file. file=[$history_file]";
+   print $FH "="x50 . "\n";
+   print $FH localtime . "\n";
+   print $FH "\n";
+   print $FH join( "\n", @passwords ) . "\n";
+   print $FH "\n";
+   chmod 0600, $history_file
+      or confess "Chmod on history file failed. file=[$history_file]";
+
+   close( $FH );
 }
 
 #---------------------------------------------------
@@ -333,6 +377,12 @@ sub _init_obj
 # getters/setters - public
 #
 #---------------------------------------------------
+
+sub get_data_dir_setting
+{
+   my $self = shift;
+   return( $self->{ settings }->{ data_dir } );
+}
 
 sub get_letters_setting
 {
@@ -364,11 +414,27 @@ sub get_uppercase_setting
    return( $self->{ settings }->{ uppercase } );
 }
 
+sub get_write_history_setting
+{
+   my $self = shift;
+   return( $self->{ settings }->{ write_history } );
+}
+
 #---------------------------------------------------
 #
 # getters/setters - private
 #
 #---------------------------------------------------
+
+sub _set_data_dir_setting
+{
+   my $self = shift;
+   my $value = shift;
+
+   is_non_empty( $value ) or confess "Value is empty";
+
+   $self->{ settings }->{ data_dir } = $value;
+}
 
 sub _set_letters_setting
 {
@@ -428,6 +494,18 @@ sub _set_uppercase_setting
       or confess "Value is invalid. value=[$value]";
 
    $self->{ settings }->{ uppercase } = $value;
+}
+
+sub _set_write_history_setting
+{
+   my $self = shift;
+   my $value = shift;
+
+   is_non_empty( $value ) or confess "Value is empty";
+   $value eq $YES or $value eq $NO 
+      or confess "Value is invalid. value=[$value]";
+
+   $self->{ settings }->{ write_history } = $value;
 }
 
 
