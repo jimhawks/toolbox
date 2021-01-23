@@ -28,6 +28,8 @@ our @EXPORT = qw(
    get_file_list
    get_file_list_for_patterns
    get_filesys_list
+   get_os_type
+   get_home_dir
    get_random_number
    grepi_array
    is_array_cnt_even
@@ -36,6 +38,7 @@ our @EXPORT = qw(
    is_hash_empty
    is_item_in_array
    is_non_empty
+   is_windows
    ltrim
    nvl
    read_file
@@ -200,6 +203,36 @@ sub get_filesys_list
    return( sort @_gfl_file_list );
 }
 
+sub get_home_dir
+{
+   my $dir = "";
+   if ( is_windows() )
+   {
+      $dir = $ENV{ USERPROFILE };
+   }
+
+   return( $dir );
+}
+
+sub get_os_type
+{
+   my $os = lc( $^O );
+
+   my $type = "";
+   if ( $os eq "mswin32" )
+   {
+      $type = "windows";
+   }
+   elsif ( $os eq "linux" )
+   {
+      $type = "linux";
+   }
+   else
+   {
+      $type = "unknown";
+   }
+}
+
 sub get_random_number
 {
    my @args = @_;
@@ -346,6 +379,11 @@ sub is_non_empty
    my $str = shift;
    my $rc = ( defined( $str ) and length( $str ) > 0 ) ? 1 : 0;
    return( $rc );
+}
+
+sub is_windows
+{
+   return( get_os_type() eq "windows" ? 1 : 0 );
 }
 
 sub ltrim
