@@ -7,3 +7,6 @@ export EDITOR=vi
 export PS1='$USER@`uname -n`:`pwd`>
 $ '
 
+# enable: edit cmd line history with vi
+set -o vi
+

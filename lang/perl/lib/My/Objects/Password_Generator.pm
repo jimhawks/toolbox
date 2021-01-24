@@ -5,6 +5,7 @@ use warnings;
 use Data::Dumper;
 
 use Carp qw( cluck confess );
+use File::Path qw( make_path );
 
 use lib "$FindBin::Bin/../../../../../lib";
 use My::Constants qw(
@@ -354,7 +355,7 @@ sub _write_history
    my $data_dir = $self->get_data_dir_setting();
    if ( ! -e $data_dir )
    {
-      mkdir $data_dir or confess "Unable to mkdir.  dir=[$data_dir]";
+      make_path( $data_dir ) or confess "Unable to mkdir.  dir=[$data_dir]";
    }
    chmod 0700, $data_dir or confess "Unable to chmod dir. dir=[$data_dir]";
    

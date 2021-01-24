@@ -17,7 +17,7 @@ use FindBin;
 # modules - custom
 #
 #--------------------------------------------------
-use lib "$FindBin::Bin/../../lib";
+use lib "$FindBin::Bin/../../../lib";
 use My::Objects::Exe;
 use My::Objects::Password_Generator;
 use My::Constants qw(
@@ -44,8 +44,11 @@ my @opt_spec = qw(
    no_numbers|n
    no_lowercase|lc
    no_uppercase|uc
+   no_write_history|wh
+
    dash_group|dg
    num_passwords|np=i
+   data_dir|dd=s
 );
 
 my $pgen = "";
@@ -79,12 +82,17 @@ sub init
    my $use_uppercase = nvl( get_no_uppercase_opt(), $FALSE ) == $FALSE ? $YES : $NO;
    my $use_lowercase = nvl( get_no_lowercase_opt(), $FALSE ) == $FALSE ? $YES : $NO;
 
+   my $write_history = nvl( get_no_write_history_opt(), $FALSE ) == $FALSE ? $YES : $NO;
+
    $pgen = new My::Objects::Password_Generator(
-              letters    => $use_letters,
-              numbers    => $use_numbers,
-              symbols    => $use_symbols,
-              uppercase  => $use_uppercase,
-              lowercase  => $use_lowercase,
+              letters       => $use_letters,
+              numbers       => $use_numbers,
+              symbols       => $use_symbols,
+              uppercase     => $use_uppercase,
+              lowercase     => $use_lowercase,
+              write_history => $write_history,
+
+              data_dir      => get_data_dir_opt(),
            );
 }
 
@@ -127,23 +135,19 @@ sub term
 # functions - others
 #
 #--------------------------------------------------
-sub convert_truefalse_opt_to_yesno
-{
-   my $self = shift;
 
-   my $value = shift;
 
-   $value = nvl( $value, $FALSE );
-   $value == $TRUE or $value == $FALSE or confess "Value is not true or false";
-
-   return( $value == $TRUE ? $YES : $NO );
-}
 
 #--------------------------------------------------
 #
 # getters/setters - exe - options
 #
 #--------------------------------------------------
+
+sub get_data_dir_opt
+{
+   return( $exe->get_opt_value( "data_dir" ) );
+}
 
 sub get_dash_group_opt
 {
@@ -173,6 +177,11 @@ sub get_no_symbols_opt
 sub get_no_uppercase_opt
 {
    return( $exe->get_opt_value( "no_uppercase" ) );
+}
+
+sub get_no_write_history_opt
+{
+   return( $exe->get_opt_value( "no_write_history" ) );
 }
 
 sub get_num_passwords_opt
