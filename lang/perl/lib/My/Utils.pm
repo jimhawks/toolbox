@@ -37,6 +37,7 @@ our @EXPORT = qw(
    is_empty
    is_hash_empty
    is_item_in_array
+   is_linux
    is_non_empty
    is_windows
    ltrim
@@ -210,6 +211,10 @@ sub get_home_dir
    {
       $dir = $ENV{ USERPROFILE };
    }
+   elsif ( is_linux() )
+   {
+      $dir = $ENV{ HOME };
+   }
 
    return( $dir );
 }
@@ -372,6 +377,11 @@ sub is_item_in_array
       }
    }
    return( $is_found );
+}
+
+sub is_linux
+{
+   return( get_os_type() eq "linux" ? 1 : 0 );
 }
 
 sub is_non_empty
