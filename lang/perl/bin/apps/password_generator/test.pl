@@ -3,13 +3,9 @@
 use strict;
 use warnings;
 
+my $str = " 1   3 ";
 
-if ( defined( undef ) )
-{
-   print "true\n";
-}
-else
-{
-   print "false\n";
-}
+$str =~ s/  */ /g;
+
+print "[$str]\n";
 

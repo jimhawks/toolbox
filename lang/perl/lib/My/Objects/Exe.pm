@@ -11,6 +11,7 @@ use lib "$FindBin::Bin/../../../../lib";
 use My::Utils qw(
    get_cmd_line_options
    is_array_cnt_even
+   is_hash_empty
    is_non_empty
    nvl
 );
@@ -77,6 +78,24 @@ sub get_opts
            ? %{ $self->{ options } } 
            : $self->{ options } 
    );
+}
+
+#---------------------------------------------------
+
+sub is_any_args
+{
+   my $self = shift;
+
+   my %hash = $self->get_args();
+   return( is_hash_empty( %hash ) );
+}
+
+sub is_any_opts
+{
+   my $self = shift;
+
+   my %hash = $self->get_opts();
+   return( is_hash_empty( %hash ) );
 }
 
 #---------------------------------------------------
