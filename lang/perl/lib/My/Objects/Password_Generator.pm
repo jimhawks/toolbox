@@ -12,6 +12,7 @@ use My::Constants qw(
    $NO
 );
 use My::Utils qw(
+   get_home_dir
    get_random_number
    is_array_cnt_even
    is_non_empty
@@ -26,7 +27,7 @@ my $DEFAULT_NUM_PASSWORDS    = 1;
 my $DEFAULT_DASH_GROUP_LEN   = 5;
 my $DEFAULT_NUM_DASH_GROUPS  = 6;
 
-my $DEFAULT_DATA_DIR         = "$ENV{ HOME }/.pgen";
+my $DEFAULT_DATA_DIR         = get_home_dir() . "/.pgen";
 
 #===============================================================
 #
