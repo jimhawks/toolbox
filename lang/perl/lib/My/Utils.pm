@@ -45,6 +45,8 @@ our @EXPORT = qw(
    read_file
    remove_array_duplicates
    rtrim
+   substitute_shell_vars_in_array
+   substitute_shell_vars_in_str
    trim
    verify_dir_exists
    verify_dir_is_readable
@@ -445,6 +447,27 @@ sub rtrim
    my $str = nvl( shift, "" );
    is_non_empty( $str ) or return "";
    $str =~ s/\s+$//;
+   return( $str );
+}
+
+sub substitute_shell_vars_in_array
+{
+   my @arr = @_;
+
+   my @arr2 = ();
+   foreach my $str ( @arr )
+   {
+      my $str2 = substitute_shell_vars_in_str( $str );
+      push( @arr2, $str2 );
+   }
+
+   return( @arr2 );
+}
+
+sub substitute_shell_vars_in_str
+{
+   my $str = nvl( shift, "" );
+   $str =~ s/\$(\w+)/$ENV{$1}/g;
    return( $str );
 }
 

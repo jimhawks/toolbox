@@ -1,4 +1,4 @@
-#!/usr/bin/perl 
+#!/usr/bin/perl
 
 use strict;
 use warnings;
@@ -28,8 +28,10 @@ use My::Constants qw(
 );
 use My::Utils qw(
    is_array_empty
+   is_non_empty
    is_empty
    nvl
+   substitute_shell_vars_in_str
    trim
 );
 
@@ -52,6 +54,8 @@ my @opt_spec = qw(
 
    num_passwords|np=i
    data_dir|dd=s
+
+   prompt|pr
 );
 
 my $pgen = "";
@@ -77,20 +81,26 @@ exit 0;
 
 sub init
 {
-   # if no cmd line args, prompt for them.
-   # (this is for when script is executed via double-click)
-   if ( is_array_empty( @ARGV ) )
+   # save argv in case prompt opt was given
+   my @save_ARGV = @ARGV;
+
+   # create exe obj which gets options and args
+   $exe = new My::Objects::Exe( arg_list => \@arg_list, opt_spec => \@opt_spec );
+   
+   # if prompt option, then prompt for cmd line args
+   if ( is_non_empty( get_prompt_opt() ) and get_prompt_opt() == $TRUE )
    {
       print "enter cmd line args (enter to accept defaults): ";
       chomp( my $str = <STDIN> );
       $str = trim( $str );
       $str =~ s/  */ /g;
-      @ARGV = split( / /, $str );
+      #$str =~ s/\$(\w+)/$ENV{$1}/g;
+      $str = substitute_shell_vars_in_str( $str );
+      my @tmp = split( / /, $str );
+      @ARGV = ( @save_ARGV, @tmp );
+      $exe = new My::Objects::Exe( arg_list => \@arg_list, opt_spec => \@opt_spec );
    }
 
-   # create exe obj which gets options and args
-   $exe = new My::Objects::Exe( arg_list => \@arg_list, opt_spec => \@opt_spec );
-   
    # get options
    my $use_letters   = get_letters_opt();
    my $use_numbers   = get_numbers_opt();
@@ -215,6 +225,11 @@ sub get_num_passwords_opt
 sub get_numbers_opt
 {
    return( $exe->get_opt_value( "numbers" ) );
+}
+
+sub get_prompt_opt
+{
+   return( $exe->get_opt_value( "prompt" ) );
 }
 
 sub get_symbols_opt
