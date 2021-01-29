@@ -2,9 +2,7 @@
 
 vim \
    ./edit.sh \
-   ./password_generator.pl \
-   ./pgen.pl \
-   ./pgendg.pl \
+   ./exe.pl \
    ../../../lib/My/Objects/Password_Generator.pm \
    ../../../lib/My/Objects/Exe.pm \
    ../../../lib/My/Utils.pm \

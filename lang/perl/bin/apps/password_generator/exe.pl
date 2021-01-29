@@ -28,9 +28,10 @@ use My::Constants qw(
 );
 use My::Utils qw(
    is_array_empty
-   is_non_empty
    is_empty
+   is_non_empty
    nvl
+   substitute_shell_vars_in_array
    substitute_shell_vars_in_str
    trim
 );
@@ -51,6 +52,7 @@ my @opt_spec = qw(
    uppercase|uc
 
    no_write_history|nwh
+   dash_group|dg
 
    num_passwords|np=i
    data_dir|dd=s
@@ -81,6 +83,8 @@ exit 0;
 
 sub init
 {
+   @ARGV = substitute_shell_vars_in_array( @ARGV );
+
    # save argv in case prompt opt was given
    my @save_ARGV = @ARGV;
 
@@ -165,15 +169,27 @@ sub main
    my $num_passwords = nvl( get_num_passwords_opt(), 1 );
 
    my @passwords = ();
-   
-   my $max_password_len = pop @ARGV;
-   my $min_password_len = nvl( pop @ARGV, $max_password_len );
+   if ( nvl( get_dash_group_opt(), $FALSE ) == $TRUE )
+   {
+      my $num_groups = shift @ARGV;
+      my $group_len  = shift @ARGV;
+      @passwords = $pgen->get_dash_passwords( 
+         num_groups    => $num_groups,
+         group_len     => $group_len,
+         num_passwords => $num_passwords,
+      );
+   }
+   else
+   {
+      my $max_password_len = pop @ARGV;
+      my $min_password_len = nvl( pop @ARGV, $max_password_len );
 
-   @passwords = $pgen->get_passwords( 
-      min_len       => $min_password_len,
-      max_len       => $max_password_len,
-      num_passwords => $num_passwords,
-   );
+      @passwords = $pgen->get_passwords( 
+         min_len       => $min_password_len,
+         max_len       => $max_password_len,
+         num_passwords => $num_passwords,
+      );
+   }
 
    print join( "\n", @passwords ) . "\n";
 }
@@ -196,6 +212,11 @@ sub term
 # getters/setters - exe - options
 #
 #--------------------------------------------------
+
+sub get_dash_group_opt
+{
+   return( $exe->get_opt_value( "dash_group" ) );
+}
 
 sub get_data_dir_opt
 {
