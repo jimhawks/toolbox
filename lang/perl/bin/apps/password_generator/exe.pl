@@ -31,6 +31,7 @@ use My::Utils qw(
    is_empty
    is_non_empty
    nvl
+   nvle
    substitute_shell_vars_in_array
    substitute_shell_vars_in_str
    trim
@@ -92,7 +93,7 @@ sub init
    $exe = new My::Objects::Exe( arg_list => \@arg_list, opt_spec => \@opt_spec );
    
    # if prompt option, then prompt for cmd line args
-   if ( is_non_empty( get_prompt_opt() ) and get_prompt_opt() == $TRUE )
+   if ( nvl( get_prompt_opt(), $FALSE ) == $TRUE )
    {
       print "enter cmd line args (enter to accept defaults): ";
       chomp( my $str = <STDIN> );
@@ -196,7 +197,10 @@ sub main
 
 sub term
 {
-   <STDIN>;
+   if ( nvl( get_prompt_opt(), $FALSE ) == $TRUE )
+   {
+      <STDIN>;
+   }
 }
            
 #--------------------------------------------------

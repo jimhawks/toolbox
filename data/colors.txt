@@ -1,0 +1,13 @@
+black
+green
+blue
+purple
+gray
+indigo
+brown
+orange
+red
+maroon
+copper
+yellow
+silver

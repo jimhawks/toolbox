@@ -1,11 +1,6 @@
+tiny
 small
 medium
 large
-extra-large
+big
 huge
-gigantic
-tiny
-humongous
-gargantuan
-miniscule
-super-sized

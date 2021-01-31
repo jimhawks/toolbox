@@ -1,8 +1,11 @@
 package My::Utils;
 
+
 use strict;
 use warnings;
 use Data::Dumper;
+
+use feature "state";  # required for state vars
 
 use Carp qw( cluck confess );
 use File::Find;
@@ -28,9 +31,26 @@ our @EXPORT = qw(
    get_file_list
    get_file_list_for_patterns
    get_filesys_list
-   get_os_type
    get_home_dir
+   get_list_from_file
+   get_list_of_colors
+   get_list_of_sizes
+   get_os_type
+
+   get_random_birthdate
+   get_random_color
+   get_random_female_first_name
+   get_random_female_full_name
+   get_random_last_name
+   get_random_male_first_name
+   get_random_male_full_name
+   get_random_noun
    get_random_number
+   get_random_pick_from_list
+   get_random_pick_from_list_file
+   get_random_size
+   get_random_username
+
    grepi_array
    is_array_cnt_even
    is_array_empty
@@ -42,8 +62,13 @@ our @EXPORT = qw(
    is_windows
    ltrim
    nvl
+   nvle
    read_file
    remove_array_duplicates
+
+   remove_blank_lines
+   remove_comment_lines
+
    rtrim
    substitute_shell_vars_in_array
    substitute_shell_vars_in_str
@@ -53,6 +78,15 @@ our @EXPORT = qw(
    verify_file_exists
    verify_file_is_readable
 );
+
+our @female_first_name_list = ();
+our @last_name_list         = ();
+our @male_first_name_list   = ();
+
+our @color_list             = ();
+our @misc_adj_list          = ();
+our @noun_list              = ();
+our @size_list              = ();
 
 #### tbd
 ## is_substr_in_strings
@@ -221,6 +255,49 @@ sub get_home_dir
    return( $dir );
 }
 
+sub get_list_from_file
+{
+   my $file = nvl( shift, "" );
+
+   chomp( my @list = read_file( $file ) );
+   @list = remove_blank_lines( remove_comment_lines( @list ) );
+
+   return( @list );
+}
+
+sub get_list_of_colors
+{
+   if ( is_array_empty( @color_list ) )
+   {
+      my $file = "$ENV{ TLBX_DATA }/colors.txt";
+      @color_list = get_list_from_file( $file );
+   }
+   
+   return( @color_list );
+}
+
+sub get_list_of_misc_adj
+{
+   if ( is_array_empty( @misc_adj_list ) )
+   {
+      my $file = "$ENV{ TLBX_DATA }/adj.misc.txt";
+      @color_list = get_list_from_file( $file );
+   }
+   
+   return( @misc_adj_list );
+}
+
+sub get_list_of_sizes
+{
+   if ( is_array_empty( @size_list ) )
+   {
+      my $file = "$ENV{ TLBX_DATA }/sizes.txt";
+      @size_list = get_list_from_file( $file );
+   }
+   
+   return( @size_list );
+}
+
 sub get_os_type
 {
    my $os = lc( $^O );
@@ -238,6 +315,81 @@ sub get_os_type
    {
       $type = "unknown";
    }
+}
+
+sub get_random_birthdate
+{
+   my $date = get_random_number( 1965, 2002 )
+              . "-" . sprintf( "%02d", get_random_number( 1, 12 ) )
+              . "-" . sprintf( "%02d", get_random_number( 1, 28 ) )
+              ;
+   return( $date );
+}
+
+sub get_random_color
+{
+   my @list = get_list_of_colors();
+   return( get_random_pick_from_list( @list ) );
+}
+
+sub get_random_female_first_name
+{
+   if ( is_array_empty( @female_first_name_list ) )
+   {
+      my $file = "$ENV{ TLBX_DATA }/names.first.female.txt";
+      @female_first_name_list = get_list_from_file( $file );
+   }
+   
+   return( get_random_pick_from_list( @female_first_name_list ) );
+}
+
+sub get_random_female_full_name
+{
+   my $name = get_random_female_first_name()
+              . " " .  get_random_last_name();
+   
+   return( $name );
+}
+
+sub get_random_last_name
+{
+   if ( is_array_empty( @last_name_list ) )
+   {
+      my $file = "$ENV{ TLBX_DATA }/names.last.txt";
+      @last_name_list = get_list_from_file( $file );
+   }
+   
+   return( get_random_pick_from_list( @last_name_list ) );
+}
+
+sub get_random_male_first_name
+{
+   if ( is_array_empty( @male_first_name_list ) )
+   {
+      my $file = "$ENV{ TLBX_DATA }/names.first.male.txt";
+      @male_first_name_list = get_list_from_file( $file );
+   }
+   
+   return( get_random_pick_from_list( @male_first_name_list ) );
+}
+
+sub get_random_male_full_name
+{
+   my $name = get_random_male_first_name()
+              . " " .  get_random_last_name();
+   
+   return( $name );
+}
+
+sub get_random_noun
+{
+   if ( is_array_empty( @noun_list ) )
+   {
+      my $file = "$ENV{ TLBX_DATA }/nouns.things.txt";
+      @noun_list = get_list_from_file( $file );
+   }
+   
+   return( get_random_pick_from_list( @noun_list ) );
 }
 
 sub get_random_number
@@ -282,6 +434,43 @@ sub get_random_number
    return( $num );
 }
 
+sub get_random_pick_from_list
+{
+   my @list = @_;
+
+   my $item = $list[ get_random_number( 0, $#list ) ];
+
+   return( $item );
+}
+
+sub get_random_pick_from_list_file
+{
+   my $file = nvl( shift, "" );
+   
+   chomp( my @list = read_file( $file ) );
+   my $item = $list[ get_random_number( 0, $#list ) ];
+
+   return( $item );
+}
+
+sub get_random_size
+{
+   my @list = get_list_of_sizes();
+   return( get_random_pick_from_list( @list ) );
+}
+
+sub get_random_username
+{
+   my @adj = ( 
+                get_list_of_colors(), 
+                get_list_of_sizes(),
+                get_list_of_misc_adj(),
+             );
+   my $name = get_random_pick_from_list( @adj )
+              . "_" . get_random_noun();
+
+   return( $name );
+}
 sub grepi_array
 {
    my $strs_ref  = shift;
@@ -413,6 +602,13 @@ sub nvl
    return( defined( $val ) ? $val : $default );
 }
 
+sub nvle
+{
+   my $val     = shift;
+   my $default = shift;
+   return( is_non_empty( $val ) ? $val : $default );
+}
+
 sub read_file
 {
    my $file = nvl( shift, "" );
@@ -440,6 +636,40 @@ sub remove_array_duplicates
    }
 
    return( @new_arr );
+}
+
+sub remove_blank_lines
+{
+   my @lines = @_;
+
+   my @tmp = ();
+   foreach my $line ( @lines )
+   {
+      if ( $line =~ /^ *$/ )
+      {
+         next;
+      }
+      push( @tmp, $line );
+   }
+
+   return( @tmp );
+}
+
+sub remove_comment_lines
+{
+   my @lines = @_;
+
+   my @tmp = ();
+   foreach my $line ( @lines )
+   {
+      if ( $line =~ /^ *#/ )
+      {
+         next;
+      }
+      push( @tmp, $line );
+   }
+
+   return( @tmp );
 }
 
 sub rtrim
