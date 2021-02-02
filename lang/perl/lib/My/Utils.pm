@@ -27,10 +27,12 @@ our @ISA = qw( Exporter );
 our @EXPORT = qw(
    add_new_lines
    get_cmd_line_options
+   get_conf_from_file
    get_dir_list
    get_file_list
    get_file_list_for_patterns
    get_filesys_list
+   get_hash_from_file
    get_home_dir
    get_list_from_file
    get_list_of_colors
@@ -174,6 +176,11 @@ sub get_cmd_line_options
    return( %options );
 }
 
+sub get_conf_from_file
+{
+   return( get_hash_from_file( @_ ) );
+}
+
 sub get_dir_list
 {
    my @filesys_list = get_filesys_list( @_ );
@@ -238,6 +245,26 @@ sub get_filesys_list
    find( { wanted => \&_gfl_wanted }, $dir );
 
    return( sort @_gfl_file_list );
+}
+
+sub get_hash_from_file
+{
+   # Expected format of file.
+   #
+   # The file will contain a hash ref.
+   #
+   # example file:
+   # {
+   #    log_dir  => "/dir1/dir2",
+   #    max_logs => 5,
+   # }
+   #
+   my $file = nvl( shift, "" );
+
+   verify_file_is_readable( $file );
+   my $href = do $file;
+
+   return( $href );
 }
 
 sub get_home_dir
