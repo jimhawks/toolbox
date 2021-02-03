@@ -1,0 +1,11 @@
+PowerShell is an object-based scripting language
+
+PS is part of WMF (Windows Management Framework)
+
+PowerShellGet 
+	- used to getting and installing modules
+	- it is one pkg provider of many to OneGet
+
+OneGet -> used to discover and install pkgs from the web
+
+

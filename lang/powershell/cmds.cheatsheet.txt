@@ -1,0 +1,16 @@
+Update help
+	> Update-Help
+
+Get Execution Policy
+	> Get-ExecutionPolicy
+
+	# by default, powershell is set to "restricted".
+        # meaning, no scripts can be run
+	# set policy to "remote signed" to run scripts.
+
+Set Execution Policy
+	> Set-ExecutionPolicy RemoteSigned
+
+To enable remote powershell cmds on a computer
+	On the target computer
+	> Enable-PSRemoting
