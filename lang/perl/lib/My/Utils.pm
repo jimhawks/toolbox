@@ -63,6 +63,7 @@ our @EXPORT = qw(
    is_non_empty
    is_windows
    ltrim
+   nem
    nvl
    nvle
    read_file
@@ -74,6 +75,7 @@ our @EXPORT = qw(
    rtrim
    substitute_shell_vars_in_array
    substitute_shell_vars_in_str
+   touch_files
    trim
    verify_dir_exists
    verify_dir_is_readable
@@ -342,6 +344,8 @@ sub get_os_type
    {
       $type = "unknown";
    }
+
+   return( $type );
 }
 
 sub get_random_birthdate
@@ -622,6 +626,13 @@ sub ltrim
    return( $str );
 }
 
+sub nem
+{
+   my $val     = shift;
+   my $default = shift;
+   return( is_non_empty( $val ) ? $val : $default );
+}
+
 sub nvl
 {
    my $val     = shift;
@@ -726,6 +737,16 @@ sub substitute_shell_vars_in_str
    my $str = nvl( shift, "" );
    $str =~ s/\$(\w+)/$ENV{$1}/g;
    return( $str );
+}
+
+sub touch_files
+{
+   my @list = @_;
+   foreach my $file ( @list )
+   {
+      open( my $FH, ">>", $file ) or confess "Open failed. file=[$file]";
+      close( $FH );
+   }
 }
 
 sub trim

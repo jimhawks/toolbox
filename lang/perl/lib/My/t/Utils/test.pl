@@ -8,6 +8,7 @@ use FindBin;
 use File::Basename;
 
 use lib "$FindBin::Bin/../../../../lib";
+use Encode;
 use My::Utils qw(
    get_random_birthdate
 );
