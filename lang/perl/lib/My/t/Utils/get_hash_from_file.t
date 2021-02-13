@@ -12,7 +12,7 @@ use File::Basename;
 
 use lib "$FindBin::Bin/../../../../lib";
 use My::Utils qw(
-   grepi_file
+   verify_dir_exists
 );
 
 my $SCRIPT = basename( $0 );
