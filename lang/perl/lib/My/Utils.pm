@@ -261,10 +261,11 @@ sub get_hash_from_file
    #    max_logs => 5,
    # }
    #
-   my $file = nvl( shift, "" );
+   my $file = shift;
 
    verify_file_is_readable( $file );
    my $href = do $file;
+   $href = nvl( $href, { } );
 
    return( $href );
 }
@@ -765,10 +766,9 @@ sub verify_dir_exists
 
 sub verify_dir_is_readable
 {
-   my $dir = nvl( shift, "");
+   my $dir = shift;
 
    verify_dir_exists( $dir );
-
    -r $dir or confess "ERROR. Dir is not readable. dir=[$dir]";
 }
 
@@ -779,15 +779,13 @@ sub verify_file_exists
    is_non_empty( $file ) or confess "ERROR. Filename is empty";
    -e $file or confess "ERROR. File not found. file=[$file]";
    -f $file or confess "ERROR. File is not a file. file=[$file]";
-
 }
 
 sub verify_file_is_readable
 {
-   my $file = nvl( shift, "" );
+   my $file = shift;
 
    verify_file_exists( $file );
-
    -r $file or confess "ERROR. File is not readable. file=[$file]";
 }
 
