@@ -1,0 +1,3 @@
+( Get-Process )[0].Path | Get-Member
+
+	".Path.GetType()" does NOT work.  It gives you some bland generic object type.
