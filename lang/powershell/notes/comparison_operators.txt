@@ -1,0 +1,11 @@
+https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_comparison_operators?view=powershell-7.1
+
+-eq	equals
+-ne	not equals
+-gt	greater than
+-ge	greater than or equal to
+-lt	less than
+-le	less than or equal to
+
+add "i" todo case-insensitive comparison
+e.g. -ieq
