@@ -31,14 +31,14 @@ our @EXPORT = qw(
    get_dir_list
    get_file_list
    get_file_list_for_patterns
-   get_filesys_list
    get_hash_from_file
    get_home_dir
    get_list_from_file
    get_list_of_colors
+   get_list_of_files_and_dirs
+   get_list_of_misc_adj
    get_list_of_sizes
    get_os_type
-
    get_random_birthdate
    get_random_color
    get_random_female_first_name
@@ -52,7 +52,14 @@ our @EXPORT = qw(
    get_random_pick_from_list_file
    get_random_size
    get_random_username
-
+   get_recursive_list_of_dirs
+   get_recursive_list_of_files
+   get_recursive_list_of_files_and_dirs
+   get_recursive_list_of_text_files
+   grep_str_in_array
+   grep_strs_in_array
+   grepv_str_in_array
+   grepv_strs_in_array
    grepi_array
    is_array_cnt_even
    is_array_empty
@@ -65,13 +72,11 @@ our @EXPORT = qw(
    ltrim
    nem
    nvl
-   nvle
+   read_dir
    read_file
    remove_array_duplicates
-
    remove_blank_lines
    remove_comment_lines
-
    rtrim
    substitute_shell_vars_in_array
    substitute_shell_vars_in_str
@@ -160,6 +165,8 @@ sub get_cmd_line_options
          #       s   string
          #       i   integer
          #       f   float
+         #    <modifier>
+         #       @   array e.g. file=s@
          #
          #    examples:
          #       "debug_on"    --debug_on
@@ -185,7 +192,7 @@ sub get_conf_from_file
 
 sub get_dir_list
 {
-   my @filesys_list = get_filesys_list( @_ );
+   my @filesys_list = get_list_of_files_and_dirs( @_ );
 
    my @dir_list = ();
    foreach my $item ( @filesys_list )
@@ -201,7 +208,7 @@ sub get_dir_list
 
 sub get_file_list
 {
-   my @filesys_list = get_filesys_list( @_ );
+   my @filesys_list = get_list_of_files_and_dirs( @_ );
 
    my @file_list = ();
    foreach my $item ( @filesys_list )
@@ -235,18 +242,6 @@ sub get_file_list_for_patterns
    @files = remove_array_duplicates( @files );
 
    return( sort @files );
-}
-
-sub get_filesys_list
-{
-   my $dir = nvl( shift, "");
-
-   verify_dir_is_readable( $dir );
-
-   @_gfl_file_list = ();
-   find( { wanted => \&_gfl_wanted }, $dir );
-
-   return( sort @_gfl_file_list );
 }
 
 sub get_hash_from_file
@@ -304,6 +299,18 @@ sub get_list_of_colors
    }
    
    return( @color_list );
+}
+
+sub get_list_of_files_and_dirs
+{
+   my $dir = nvl( shift, "");
+
+   verify_dir_is_readable( $dir );
+
+   @_gfl_file_list = ();
+   find( { wanted => \&_gfl_wanted }, $dir );
+
+   return( sort @_gfl_file_list );
 }
 
 sub get_list_of_misc_adj
@@ -503,6 +510,192 @@ sub get_random_username
 
    return( $name );
 }
+
+sub get_recursive_list_of_dirs
+{
+   my @tmp = get_recursive_list_of_files_and_dirs( @_ );
+
+   my @list = ();
+   foreach my $item ( @tmp )
+   {
+      if ( -d $item )
+      {
+         push( @list, $item );
+      }
+   }
+
+   return( sort @list );
+}
+
+sub get_recursive_list_of_files
+{
+   my @tmp = get_recursive_list_of_files_and_dirs( @_ );
+
+   my @list = ();
+   foreach my $item ( @tmp )
+   {
+      if ( -f $item )
+      {
+         push( @list, $item );
+      }
+   }
+
+   return( sort @list );
+}
+
+sub get_recursive_list_of_files_and_dirs
+{
+   my %args = @_;
+
+   my $dir = nvl( $args{ dir }, "");
+   my @patterns = @{ nvl( $args{ patterns }, [ "*" ] ) };
+
+   verify_dir_is_readable( $dir );
+
+   my @list = ();
+   push( @list, $dir );
+
+   # process dirs 
+   foreach my $item ( read_dir( $dir ) )
+   {
+      my $fpath = "$dir/$item";
+      if ( -d $fpath )
+      {
+         my @tmp = get_recursive_list_of_files_and_dirs( 
+            dir      => $fpath,
+            patterns => \@patterns,
+         );
+         push( @list, @tmp );
+      }
+   }
+
+   # process files
+   foreach my $pattern ( @patterns )
+   {
+      foreach my $item ( glob "$dir/$pattern" )
+      {
+         if ( -f $item )
+         {
+            push( @list, $item );
+         }
+      }
+   }
+
+   return( sort @list );
+}
+
+sub get_recursive_list_of_text_files
+{
+   my @tmp = get_recursive_list_of_files_and_dirs( @_ );
+
+   my @list = ();
+   foreach my $item ( @tmp )
+   {
+      if ( -f $item and -T $item)
+      {
+         push( @list, $item );
+      }
+   }
+
+   return( sort @list );
+}
+
+sub grep_str_in_array
+{
+   my %args = @_;
+
+   my $str         = nvl( $args{ str }, "" );
+   my @arr         = @{ nvl( $args{ array }, [ ] ) };
+   my $ignore_case = nvl( $args{ ignore_case }, 0 );
+
+   is_non_empty( $str ) or confess "str is empty";
+
+   my @output = ();
+   if ( $ignore_case )
+   {
+      push( @output, grep( /$str/i, @arr ) );
+   }
+   else
+   {
+      push( @output, grep( /$str/, @arr ) );
+   }
+
+   return( @output );
+}
+
+sub grep_strs_in_array
+{
+   my %args = @_;
+
+   my @strs        = @{ nvl( $args{ strs },  [ ] ) };
+   my @arr         = @{ nvl( $args{ array }, [ ] ) };
+   my $ignore_case = nvl( $args{ ignore_case }, 0 );
+
+   foreach my $str ( @strs )
+   {
+      my @tmp = grep_str_in_array(
+         str         => $str,
+         array       => \@arr,
+         ignore_case => $ignore_case,
+      );
+      @arr = @tmp;
+      if ( $#arr < 0 ) 
+      {
+         last;
+      }
+   }
+
+   return( @arr );
+}
+
+sub grepv_str_in_array
+{
+   my %args = @_;
+
+   my $str         = nvl( $args{ str }, "" );
+   my @arr         = @{ nvl( $args{ array }, [ ] ) };
+   my $ignore_case = nvl( $args{ ignore_case }, 0 );
+
+   is_non_empty( $str ) or confess "str is empty";
+
+   my @output = ();
+   if ( $ignore_case )
+   {
+      push( @output, grep( !/$str/i, @arr ) );
+   }
+   else
+   {
+      push( @output, grep( !/$str/, @arr ) );
+   }
+
+   return( @output );
+}
+
+sub grepv_strs_in_array
+{
+   my %args = @_;
+
+   my @strs        = @{ nvl( $args{ strs },  [ ] ) };
+   my @arr         = @{ nvl( $args{ array }, [ ] ) };
+   my $ignore_case = nvl( $args{ ignore_case }, 0 );
+
+   foreach my $str ( @strs )
+   {
+      my @tmp = grepv_str_in_array(
+         str         => $str,
+         array       => \@arr,
+         ignore_case => $ignore_case,
+      );
+      @arr = @tmp;
+      if ( $#arr < 0 ) 
+      {
+         last;
+      }
+   }
+
+   return( @arr );
+}
+
 sub grepi_array
 {
    my $strs_ref  = shift;
@@ -641,11 +834,21 @@ sub nvl
    return( defined( $val ) ? $val : $default );
 }
 
-sub nvle
+sub read_dir
 {
-   my $val     = shift;
-   my $default = shift;
-   return( is_non_empty( $val ) ? $val : $default );
+   my $dir = nvl( shift, "" );
+   opendir( my $DH, $dir ) or confess "ERROR. Open dir failed. dir=[$dir]";
+   my @list = ();
+   while( my $f = readdir( $DH ) )
+   {
+      if ( $f eq "." or $f eq ".." )
+      {
+         next;
+      }
+      push( @list, $f );
+   }
+   close( $DH );
+   return( @list );
 }
 
 sub read_file
