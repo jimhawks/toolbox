@@ -35,6 +35,7 @@ my $SCRIPT = basename( $0 );
 
 my @opt_spec = qw(
    help|h|H|?
+   debug|dbg
    ignore_case|i
    file_pattern|fp=s@
    dirs|d
@@ -51,6 +52,7 @@ my $help = <<EOT;
 $SCRIPT: get a list of files/dirs.  grep the list.
 
 usage: $SCRIPT [-h|-H|-?|--help] 
+               [debug|dbg];
                [-i|--ignore_case]
                [ [-fp|--file_pattern]=<file pattern> ...]
                <[-d|dirs] | [-f|files] | [both]>
@@ -69,10 +71,16 @@ EOT
 my %opts = get_cmd_line_options( @opt_spec );
 my %args = get_cmd_line_args(    @arg_spec );
 my $dir     = $args{ dir };
-my @strings = $args{ strings };
+my @strings = @{ $args{ strings } };
 
-#print "opts\n"; print Dumper( \%opts ) . "\n";
-#print "args\n";print Dumper( \%args ) . "\n";
+if ( $opts{ debug } )
+{
+   print "opts\n"; print Dumper( \%opts ) . "\n";
+   print "args\n"; print Dumper( \%args ) . "\n";
+
+   print "dir=[$dir]\n";
+   print "strings\n"; print Dumper( \@strings ) . "\n";
+}
 
 if ( $opts{ help } )
 {
