@@ -10,6 +10,7 @@ use Data::Dumper;
 #
 #--------------------------------------------------
 use Carp qw( cluck confess );
+use File::Basename;
 use FindBin;
 
 #--------------------------------------------------
@@ -20,6 +21,7 @@ use FindBin;
 use lib "$FindBin::RealBin/../lib";
 use My::Utils qw(
    add_new_lines
+   get_cmd_line_args
    get_cmd_line_options
    get_recursive_list_of_dirs
    get_recursive_list_of_files
@@ -28,12 +30,34 @@ use My::Utils qw(
    verify_dir_is_readable
 );
 
+
+my $SCRIPT = basename( $0 );
+
 my @opt_spec = qw(
+   help|h|H|?
    ignore_case|i
    file_pattern|fp=s@
    dirs|d
    files|f
 );
+
+my @arg_spec = qw(
+   dir
+   strings@
+);
+
+my $help = <<EOT;
+
+$SCRIPT: get a list of files/dirs.  grep the list.
+
+usage: $SCRIPT [-h|-H|-?|--help] 
+               [-i|--ignore_case]
+               [ [-fp|--file_pattern]=<file pattern> ...]
+               <[-d|dirs] | [-f|files] | [both]>
+               <dir>
+               <string ...>
+
+EOT
 
 #--------------------------------------------------
 #
@@ -43,8 +67,18 @@ my @opt_spec = qw(
 
 # get cmd line
 my %opts = get_cmd_line_options( @opt_spec );
-my $dir  = shift @ARGV;
-my @strings = @ARGV;
+my %args = get_cmd_line_args(    @arg_spec );
+my $dir     = $args{ dir };
+my @strings = $args{ strings };
+
+print "opts\n"; print Dumper( \%opts ) . "\n";
+print "args\n";print Dumper( \%args ) . "\n";
+
+if ( $opts{ help } )
+{
+   print $help;
+   exit 0;
+}
 
 # process options
 my $ignore_case = nvl( $opts{ ignore_case }, 0 );

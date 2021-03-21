@@ -26,6 +26,7 @@ our @ISA = qw( Exporter );
 
 our @EXPORT = qw(
    add_new_lines
+   get_cmd_line_args
    get_cmd_line_options
    get_conf_from_file
    get_dir_list
@@ -143,6 +144,27 @@ sub add_new_lines
       }
    }
    return( @arr );
+}
+
+sub get_cmd_line_args
+{
+   my @arg_spec = @_;
+   my %arg_vals = ();
+
+   foreach my $spec ( @arg_spec )
+   {
+      # if spec has "@" on the end
+      if ( $spec =~ /\@$/ )
+      {
+         # remove the "@" and copy remaining argv to value
+         $spec =~ s/\@$//;
+         @{ $arg_vals{ $spec } } = @ARGV;
+         last;
+      }
+      $arg_vals{ $spec } = nvl( shift @ARGV, "" );
+   }
+
+   return( %arg_vals );
 }
 
 sub get_cmd_line_options
