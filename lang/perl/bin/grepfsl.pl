@@ -71,8 +71,8 @@ my %args = get_cmd_line_args(    @arg_spec );
 my $dir     = $args{ dir };
 my @strings = $args{ strings };
 
-print "opts\n"; print Dumper( \%opts ) . "\n";
-print "args\n";print Dumper( \%args ) . "\n";
+#print "opts\n"; print Dumper( \%opts ) . "\n";
+#print "args\n";print Dumper( \%args ) . "\n";
 
 if ( $opts{ help } )
 {
