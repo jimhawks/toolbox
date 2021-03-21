@@ -25,7 +25,9 @@ require Exporter;
 our @ISA = qw( Exporter );
 
 our @EXPORT = qw(
+   add_dbg_var
    add_new_lines
+   dump_dbg_vars
    get_cmd_line_args
    get_cmd_line_options
    get_conf_from_file
@@ -98,6 +100,8 @@ our @misc_adj_list          = ();
 our @noun_list              = ();
 our @size_list              = ();
 
+my %dbg_vars = ();
+
 #### tbd
 ## is_substr_in_strings
 ## is_substr_not_in_strings
@@ -126,6 +130,19 @@ sub _gfl_wanted
 #
 #===============================================================
 
+sub add_dbg_var
+{
+   my $grp  = nvl( shift @_, "" );
+   my $name = nvl( shift @_, "" );
+   my $ref  = shift @_;
+
+   nem( $grp )  or confess "ERROR. grp is empty";
+   nem( $name ) or confess "ERROR. name is empty";
+   nem( $ref )  or confess "ERROR. ref is empty";
+
+   $dbg_vars{ $grp }{ $name } = $ref;
+}
+
 sub add_new_lines
 {
    # desc:   Add newline to each string in an array
@@ -144,6 +161,11 @@ sub add_new_lines
       }
    }
    return( @arr );
+}
+
+sub dump_dbg_vars
+{
+   print Dumper( \%dbg_vars );
 }
 
 sub get_cmd_line_args

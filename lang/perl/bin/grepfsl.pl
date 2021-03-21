@@ -20,12 +20,15 @@ use FindBin;
 #--------------------------------------------------
 use lib "$FindBin::RealBin/../lib";
 use My::Utils qw(
+   add_dbg_var
    add_new_lines
+   dump_dbg_vars
    get_cmd_line_args
    get_cmd_line_options
    get_recursive_list_of_dirs
    get_recursive_list_of_files
    grep_strs_in_array
+   grepv_strs_in_array
    nvl
    verify_dir_is_readable
 );
@@ -61,6 +64,8 @@ usage: $SCRIPT [-h|-H|-?|--help]
 
 EOT
 
+my %dbg = ();
+
 #--------------------------------------------------
 #
 # main
@@ -73,14 +78,12 @@ my %args = get_cmd_line_args(    @arg_spec );
 my $dir     = $args{ dir };
 my @strings = @{ $args{ strings } };
 
-if ( $opts{ debug } )
-{
-   print "opts\n"; print Dumper( \%opts ) . "\n";
-   print "args\n"; print Dumper( \%args ) . "\n";
+add_dbg_var( "cmdline", '%opts', \%opts );
+add_dbg_var( "cmdline", '%args', \%args );
+add_dbg_var( "copied_args", '$dir',  \$dir );
+add_dbg_var( "copied_args", '@strings', \@strings );
 
-   print "dir=[$dir]\n";
-   print "strings\n"; print Dumper( \@strings ) . "\n";
-}
+$opts{ debug } and dump_dbg_vars();
 
 if ( $opts{ help } )
 {
@@ -93,6 +96,31 @@ my $ignore_case = nvl( $opts{ ignore_case }, 0 );
 my @file_patterns = @{ nvl( $opts{ file_pattern }, [ "*" ] ) };
 my $incl_dirs  = nvl( $opts{ dirs }, 0 );
 my $incl_files = nvl( $opts{ files }, 0 );
+
+add_dbg_var( "processed_opts", '$ignore_case',  \$ignore_case );
+add_dbg_var( "processed_opts", '@file_patterns',  \@file_patterns );
+add_dbg_var( "processed_opts", '$incl_dirs',  \$incl_dirs );
+add_dbg_var( "processed_opts", '$incl_files',  \$incl_files );
+
+# separate strings to include and exclude strings
+my @incl_strings = ();
+my @excl_strings = ();
+add_dbg_var( "sorted_strings", '@incl_strings', \@incl_strings );
+add_dbg_var( "sorted_strings", '@excl_strings', \@excl_strings );
+foreach my $str ( @strings )
+{
+   if ( $str =~ /^v:/ )
+   {
+      $str =~ s/^v://;
+      push( @excl_strings, $str );
+   }
+   else
+   {
+      push( @incl_strings, $str );
+   }
+}
+
+$opts{ debug } and dump_dbg_vars();
 
 # validate dir
 verify_dir_is_readable( $dir ) or confess "ERROR. dir not readable. dir=[$dir]";
@@ -116,14 +144,28 @@ if ( $incl_dirs )
    push( @filesys_list, @tmp );
 }
 
-my @matched_files = grep_strs_in_array(
-   strs        => \@strings,
-   array       => \@filesys_list,
-   ignore_case => $ignore_case,
-);
+my @filtered = @filesys_list;
+if ( $#incl_strings >= 0 )
+{
+   my @tmp = grep_strs_in_array(
+      strs        => \@incl_strings,
+      array       => \@filtered,
+      ignore_case => $ignore_case,
+   );
+   @filtered = @tmp;
+}
+if ( $#excl_strings >= 0 )
+{
+   my @tmp = grepv_strs_in_array(
+      strs        => \@excl_strings,
+      array       => \@filtered,
+      ignore_case => $ignore_case,
+   );
+   @filtered = @tmp;
+}
 
 # print matched items
 print "\n";
-print add_new_lines( @matched_files );
+print add_new_lines( @filtered );
 
 
