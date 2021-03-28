@@ -20,6 +20,8 @@ fox
 wolf
 rabbit
 lizard
+lion
+horse
 
 table
 stove
@@ -51,6 +53,12 @@ puddle
 pond
 fire
 frost
+dune
+mud
+road
+pond
+lake
+boat
 
 moon
 sun

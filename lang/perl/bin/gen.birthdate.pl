@@ -25,7 +25,7 @@ use My::Constants qw(
 );
 use My::Utils qw(
    get_random_birthdate
-   nvle
+   nem
 );
 
 #--------------------------------------------------
@@ -66,15 +66,15 @@ sub init
              opt_spec => \@opt_spec 
           );
 
-   if ( nvle( get_prompt_opt(), $FALSE ) == $TRUE )
+   if ( nem( get_prompt_opt(), $FALSE ) == $TRUE )
    {
       print "Enter num items (default is 1): ";
       chomp( my $n = <STDIN> );
-      set_num_items( nvle( $n, 1 ) );
+      set_num_items( nem( $n, 1 ) );
    }
    else 
    {
-      set_num_items( nvle( get_num_items_arg(), 1 ) );
+      set_num_items( nem( get_num_items_arg(), 1 ) );
    }
    get_num_items() > 0 or confess "ERROR. num items is 0 or negative.";
 }
@@ -89,7 +89,7 @@ sub main
 
 sub term
 {
-   if ( nvle( get_prompt_opt(), $FALSE ) == $TRUE )
+   if ( nem( get_prompt_opt(), $FALSE ) == $TRUE )
    {
       <STDIN>;
    }
