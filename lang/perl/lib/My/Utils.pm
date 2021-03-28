@@ -550,7 +550,9 @@ sub get_random_username
                 get_list_of_misc_adj(),
              );
    my $name = get_random_pick_from_list( @adj )
-              . "_" . get_random_noun();
+              . "_" . get_random_noun()
+              . "_" . get_random_number(11, 50)
+              ;
 
    return( $name );
 }

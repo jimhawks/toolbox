@@ -23,6 +23,7 @@ lizard
 lion
 horse
 
+glass
 table
 stove
 chair
@@ -32,7 +33,10 @@ bottle
 cup
 plate
 flower
+bowl
 
+earth
+dirt
 trail
 tree
 leaf
@@ -59,6 +63,7 @@ road
 pond
 lake
 boat
+stream
 
 moon
 sun
