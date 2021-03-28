@@ -1,1 +1,0 @@
-apps/password_generator/pgen.pin.sh

@@ -10,6 +10,7 @@ use Data::Dumper;
 #
 #--------------------------------------------------
 use Carp qw( cluck confess );
+use File::Basename;
 use FindBin;
 
 #--------------------------------------------------
@@ -31,7 +32,6 @@ use My::Utils qw(
    is_empty
    is_non_empty
    nvl
-   nvle
    substitute_shell_vars_in_array
    substitute_shell_vars_in_str
    trim
@@ -42,10 +42,13 @@ use My::Utils qw(
 # globals
 #
 #--------------------------------------------------
+my $SCRIPT = basename( $0 );
+
 my $exe = "";
 my @arg_list = qw(
 );
 my @opt_spec = qw(
+   help|h|H|?
    letters|l
    symbols|s
    numbers|n
@@ -60,6 +63,39 @@ my @opt_spec = qw(
 
    prompt|pr
 );
+my $help = <<EOT;
+
+usage:
+   options:
+      help|h|H|?
+
+      letters|l
+      symbols|s
+      numbers|n
+
+      lowercase|lc
+      uppercase|uc
+   
+      no_write_history|nwh
+
+      dash_group|dg
+   
+      num_passwords|np=i
+      data_dir|dd=s
+   
+      prompt|pr
+   args
+      if dash group
+         arg1 = number of groups
+         arg2 = length of each group
+      else
+         if only 1 arg
+            arg1 = password length
+         else if 2 args
+            arg1 = min password length
+            arg2 = max password length
+
+EOT
 
 my $pgen = "";
 
@@ -82,6 +118,12 @@ exit 0;
 #
 #--------------------------------------------------
 
+sub output_help
+{
+   print $help;
+   exit 0;
+}
+
 sub init
 {
    @ARGV = substitute_shell_vars_in_array( @ARGV );
@@ -92,6 +134,8 @@ sub init
    # create exe obj which gets options and args
    $exe = new My::Objects::Exe( arg_list => \@arg_list, opt_spec => \@opt_spec );
    
+   get_help_opt() and output_help();
+
    # if prompt option, then prompt for cmd line args
    if ( nvl( get_prompt_opt(), $FALSE ) == $TRUE )
    {
@@ -225,6 +269,11 @@ sub get_dash_group_opt
 sub get_data_dir_opt
 {
    return( $exe->get_opt_value( "data_dir" ) );
+}
+
+sub get_help_opt
+{
+   return( $exe->get_opt_value( "help" ) );
 }
 
 sub get_letters_opt
