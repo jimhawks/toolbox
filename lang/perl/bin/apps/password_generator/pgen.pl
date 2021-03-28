@@ -18,7 +18,8 @@ use FindBin;
 # modules - custom
 #
 #--------------------------------------------------
-use lib "$FindBin::RealBin/../../../lib";
+use lib "$FindBin::RealBin"
+        . "/" . ( ( -e "$FindBin::RealBin/exe.pl" ) ?  "../../../lib" : "../lib" );
 use My::Utils qw(
    nvl
 );
@@ -30,7 +31,8 @@ use My::Utils qw(
 # main
 #
 #--------------------------------------------------
-my $cmd = "$FindBin::RealBin/exe.pl"
+my $exe = (-e "$FindBin::RealBin/exe.pl" ) ? "exe.pl" : "password_generator.pl";
+my $cmd = "$FindBin::RealBin/$exe"
           . " " . join( " ", @ARGV )
           ;
 my @output = `$cmd`;

@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl 
 
 use strict;
 use warnings;
@@ -11,14 +11,16 @@ use Data::Dumper;
 #--------------------------------------------------
 use Carp qw( cluck confess );
 use File::Basename;
-use FindBin;
 
 #--------------------------------------------------
 #
 # modules - custom
 #
 #--------------------------------------------------
-use lib "$FindBin::RealBin/../../../lib";
+use FindBin;
+use lib "$FindBin::RealBin"
+        . "/" . ( ( -e "$FindBin::RealBin/exe.pl" ) ?  "../../../lib" : "../lib" );
+
 use My::Utils qw(
    nvl
 );
@@ -30,7 +32,8 @@ use My::Utils qw(
 # main
 #
 #--------------------------------------------------
-my $cmd = "$FindBin::RealBin/exe.pl"
+my $exe = (-e "$FindBin::RealBin/exe.pl" ) ? "exe.pl" : "password_generator.pl";
+my $cmd = "$FindBin::RealBin/$exe"
           . " -dg"
           . " " . join( " ", @ARGV )
           ;

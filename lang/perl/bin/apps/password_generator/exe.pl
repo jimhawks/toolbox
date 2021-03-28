@@ -18,7 +18,9 @@ use FindBin;
 # modules - custom
 #
 #--------------------------------------------------
-use lib "$FindBin::RealBin/../../../lib";
+#use lib "$FindBin::RealBin/../../../lib";
+use lib "$FindBin::RealBin"
+        . "/" . ( ( -e "$FindBin::RealBin/exe.pl" ) ?  "../../../lib" : "../lib" );
 use My::Objects::Exe;
 use My::Objects::Password_Generator;
 use My::Constants qw(
