@@ -40,6 +40,7 @@ our @EXPORT = qw(
    get_list_of_colors
    get_list_of_files_and_dirs
    get_list_of_misc_adj
+   get_list_of_nasdaq_tickers
    get_list_of_sizes
    get_os_type
    get_random_birthdate
@@ -49,6 +50,7 @@ our @EXPORT = qw(
    get_random_last_name
    get_random_male_first_name
    get_random_male_full_name
+   get_random_nasdaq_ticker
    get_random_noun
    get_random_number
    get_random_pick_from_list
@@ -99,6 +101,7 @@ our @color_list             = ();
 our @misc_adj_list          = ();
 our @noun_list              = ();
 our @size_list              = ();
+our @ticker_list            = ();
 
 my %dbg_vars = ();
 
@@ -368,6 +371,24 @@ sub get_list_of_misc_adj
    return( @misc_adj_list );
 }
 
+sub get_list_of_nasdaq_tickers
+{
+   if ( is_array_empty( @ticker_list ) )
+   {
+      my $file = "$ENV{ TLBX_DATA }/nasdaq_ticker_symbols.txt";
+      my @tmp = get_list_from_file( $file );
+      shift @tmp;  # shift off the header
+      my @tmp2 = ();
+      foreach my $line ( sort @tmp )
+      {
+         my ( $ticker, undef ) = split( /,/, $line );
+         push( @ticker_list, $ticker );
+      }
+   }
+   
+   return( @ticker_list );
+}
+
 sub get_list_of_sizes
 {
    if ( is_array_empty( @size_list ) )
@@ -462,6 +483,12 @@ sub get_random_male_full_name
               . " " .  get_random_last_name();
    
    return( $name );
+}
+
+sub get_random_nasdaq_ticker
+{
+   my @list = get_list_of_nasdaq_tickers();
+   return( get_random_pick_from_list( @list ) );
 }
 
 sub get_random_noun

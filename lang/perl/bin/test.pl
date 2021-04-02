@@ -12,16 +12,10 @@ use File::Find;
 
 use lib "$FindBin::Bin/../lib";
 use My::Utils qw(
-   get_home_dir
-   is_linux
-   is_windows
-   get_os_type
+   get_random_nasdaq_ticker
 );
 
-print "type=[" . get_os_type() . "]\n";
-print "is_linux=[" . is_linux() . "]\n";
-print "is_win=[" . is_windows() . "]\n";
-print "home=[" . get_home_dir() . "]\n";
+print get_random_nasdaq_ticker(). "\n";
 
 exit 0;
 

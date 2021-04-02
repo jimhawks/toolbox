@@ -47,6 +47,9 @@ sky
 cloud
 mountain
 wind
+treeline
+ridge
+
 ocean
 snow
 beach
@@ -64,6 +67,8 @@ pond
 lake
 boat
 stream
+thunder
+lightening
 
 moon
 sun
