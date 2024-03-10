@@ -23,7 +23,7 @@ use My::Constants qw(
    $FALSE
 );
 use My::Utils qw(
-   is_non_empty
+   is_str_non_empty
    nem
 );
 

@@ -31,8 +31,8 @@ use My::Constants qw(
 );
 use My::Utils qw(
    is_array_empty
-   is_empty
-   is_non_empty
+   is_str_empty
+   is_str_non_empty
    nvl
    substitute_shell_vars_in_array
    substitute_shell_vars_in_str
@@ -162,11 +162,11 @@ sub init
    my $write_history = nvl( get_no_write_history_opt(), $FALSE ) == $FALSE ? $YES : $NO;
 
    # if no char options specified, set all to true
-   if ( is_empty( $use_letters ) 
-        and is_empty( $use_numbers ) 
-        and is_empty( $use_symbols ) 
-        and is_empty( $use_uppercase ) 
-        and is_empty( $use_lowercase ) )
+   if ( is_str_empty( $use_letters ) 
+        and is_str_empty( $use_numbers ) 
+        and is_str_empty( $use_symbols ) 
+        and is_str_empty( $use_uppercase ) 
+        and is_str_empty( $use_lowercase ) )
    {
       $use_letters   = $TRUE;
       $use_numbers   = $TRUE;

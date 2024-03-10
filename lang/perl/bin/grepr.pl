@@ -27,11 +27,11 @@ use My::Constants qw(
 #   $YES
 #   $NO
 use My::Utils qw(
-   is_non_empty
+   is_str_non_empty
    substitute_shell_vars_in_array
 );
 #   is_array_empty
-#   is_empty
+#   is_str_empty
 #   nvl
 #   nvle
 #   substitute_shell_vars_in_str
@@ -83,8 +83,8 @@ sub init
    set_search_strings( @ARGV );
 
    # validate values
-   is_non_empty( get_search_dir() )     or confess "ERROR. search dir is empty";
-   is_non_empty( get_search_strings() ) or confess "ERROR. search strings are empty";
+   is_str_non_empty( get_search_dir() )     or confess "ERROR. search dir is empty";
+   is_str_non_empty( get_search_strings() ) or confess "ERROR. search strings are empty";
 }
 
 sub main

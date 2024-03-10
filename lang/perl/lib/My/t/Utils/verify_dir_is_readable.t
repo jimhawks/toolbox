@@ -12,7 +12,7 @@ use File::Basename;
 
 use lib "$FindBin::Bin/../../../../lib";
 use My::Utils qw(
-   verify_dir_is_readable
+   is_dir_readable
 );
 
 my $SCRIPT = basename( $0 );
@@ -29,7 +29,7 @@ my $dir = "";
 # dir is not readable
 $dir = "$DATA_DIR/dir_not_readable";
 chmod 0331, $dir;
-throws_ok { verify_dir_is_readable( $dir ) } qr/Dir is not readable/, "dir not readable";
+throws_ok { is_dir_readable( $dir ) } qr/Dir is not readable/, "dir not readable";
 chmod 0775, $dir;
 
 

@@ -12,7 +12,7 @@ use My::Utils qw(
    get_cmd_line_options
    is_array_cnt_even
    is_hash_empty
-   is_non_empty
+   is_str_non_empty
    nvl
 );
 
@@ -106,7 +106,7 @@ sub get_arg_array
 
    my $key = shift;
 
-   is_non_empty( $key ) or die "ERROR. Key is empty";
+   is_str_non_empty( $key ) or die "ERROR. Key is empty";
 
    if ( !exists( $self->get_args()->{ $key } ) )
    {
@@ -125,7 +125,7 @@ sub get_arg_value
 
    my $key = shift;
 
-   is_non_empty( $key ) or die "ERROR. Key is empty";
+   is_str_non_empty( $key ) or die "ERROR. Key is empty";
 
    if ( !exists( $self->get_args()->{ $key } ) )
    {
@@ -142,7 +142,7 @@ sub get_data_array
 
    my $key = shift;
 
-   is_non_empty( $key ) or die "ERROR. Key is empty";
+   is_str_non_empty( $key ) or die "ERROR. Key is empty";
 
    if ( !exists( $self->get_data()->{ $key } ) )
    {
@@ -162,7 +162,7 @@ sub set_data_array
    my $key = shift;
    my @arr = @_;
 
-   is_non_empty( $key ) or die "ERROR. Key is empty";
+   is_str_non_empty( $key ) or die "ERROR. Key is empty";
 
    $self->get_data()->{ $key } = \@arr;
 }
@@ -173,7 +173,7 @@ sub get_data_hash
 
    my $key = shift;
 
-   is_non_empty( $key ) or die "ERROR. Key is empty";
+   is_str_non_empty( $key ) or die "ERROR. Key is empty";
 
    if ( !exists( $self->get_data()->{ $key } ) )
    {
@@ -193,7 +193,7 @@ sub set_data_hash
    my $key  = shift;
    my %hash = @_;
 
-   is_non_empty( $key ) or die "ERROR. Key is empty";
+   is_str_non_empty( $key ) or die "ERROR. Key is empty";
 
    $self->get_data()->{ $key } = \%hash;
 }
@@ -204,7 +204,7 @@ sub get_data_value
 
    my $key = shift;
 
-   is_non_empty( $key ) or die "ERROR. Key is empty";
+   is_str_non_empty( $key ) or die "ERROR. Key is empty";
 
    if ( !exists( $self->get_data()->{ $key } ) )
    {
@@ -221,7 +221,7 @@ sub set_data_value
    my $key   = shift;
    my $value = shift;
 
-   is_non_empty( $key ) or die "ERROR. Key is empty";
+   is_str_non_empty( $key ) or die "ERROR. Key is empty";
 
    $self->get_data()->{ $key } = $value;
 }
@@ -232,7 +232,7 @@ sub get_opt_array
 
    my $key = shift;
 
-   is_non_empty( $key ) or die "ERROR. Key is empty";
+   is_str_non_empty( $key ) or die "ERROR. Key is empty";
 
    if ( !exists( $self->get_opts()->{ $key } ) )
    {
@@ -252,7 +252,7 @@ sub get_opt_value
 
    my $key = shift;
 
-   is_non_empty( $key ) or die "ERROR. Key is empty";
+   is_str_non_empty( $key ) or die "ERROR. Key is empty";
 
    if ( !exists( $self->get_opts()->{ $key } ) )
    {
@@ -332,9 +332,9 @@ sub _init_set_options
    {
       my ( $name, $other )  = split( /[:=]/, $spec );
       my ( $lname, $sname ) = split( /\|/, $name );
-      if ( is_non_empty( $sname ) )
+      if ( is_str_non_empty( $sname ) )
       {
-         is_non_empty( $lname ) or confess "Lname is empty";
+         is_str_non_empty( $lname ) or confess "Lname is empty";
          $short_map{ $sname } = $lname;
       }
    }
@@ -349,7 +349,7 @@ sub _init_set_options
       if ( exists( $short_map{ $key } ) )
       {
          my $long_name = $short_map{ $key } ;
-         is_non_empty( $long_name ) or confess "Long name is empty";
+         is_str_non_empty( $long_name ) or confess "Long name is empty";
          $options2{ $long_name }  = $options{ $key };
          next;
       }
@@ -371,7 +371,7 @@ sub _set_arg
    my $key   = shift;
    my $value = shift;
 
-   is_non_empty( $key ) or die "ERROR. Key is empty";
+   is_str_non_empty( $key ) or die "ERROR. Key is empty";
 
    $self->get_args()->{ $key } = $value;
 }
@@ -383,7 +383,7 @@ sub _set_opt
    my $key   = shift;
    my $value = shift;
 
-   is_non_empty( $key ) or die "ERROR. Key is empty";
+   is_str_non_empty( $key ) or die "ERROR. Key is empty";
 
    $self->get_opts()->{ $key } = $value;
 }

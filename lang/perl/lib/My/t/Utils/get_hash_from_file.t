@@ -12,7 +12,7 @@ use File::Basename;
 
 use lib "$FindBin::Bin/../../../../lib";
 use My::Utils qw(
-   get_hash_from_file
+   read_hash_file
 );
 
 my $SCRIPT = basename( $0 );
@@ -31,7 +31,7 @@ my $got    = "";
 
 ## undef dirname
 #$dir = undef;
-#throws_ok { verify_dir_exists( $dir ) } qr/Dir name is empty/, "undef dir name";
+#throws_ok { does_dir_exist( $dir ) } qr/Dir name is empty/, "undef dir name";
 #
 ## file is nonempty, 1 line
 #$file = "$DATA_DIR/one_line";
@@ -40,49 +40,49 @@ my $got    = "";
 #is_deeply( \@got, \@expect, "1 line file" );
 #
 ## "is" check
-#is( is_empty(\%empty_array),     0, "empty array");
+#is( is_str_empty(\%empty_array),     0, "empty array");
 
 # no args
-throws_ok { get_hash_from_file( ) } qr/Filename is empty/, "no args";
+throws_ok { read_hash_file( ) } qr/Filename is empty/, "no args";
 
 # undef filename
 $file = undef;
-throws_ok { get_hash_from_file( $file ) } qr/Filename is empty/, "undef file name";
+throws_ok { read_hash_file( $file ) } qr/Filename is empty/, "undef file name";
 
 # empty filename
 $file = "";
-throws_ok { get_hash_from_file( $file ) } qr/Filename is empty/, "empty file name";
+throws_ok { read_hash_file( $file ) } qr/Filename is empty/, "empty file name";
 
 # file doesn't exit
 $file = "$DATA_DIR/file_doesnt_exist.txt";
-throws_ok { get_hash_from_file( $file ) } qr/File not found/, "file doesn't exist";
+throws_ok { read_hash_file( $file ) } qr/File not found/, "file doesn't exist";
 
 # file is a dir
 $file = "$DATA_DIR/file1.txt";
-throws_ok { get_hash_from_file( $file ) } qr/File is not a file/, "file is dir";
+throws_ok { read_hash_file( $file ) } qr/File is not a file/, "file is dir";
 
 # file is not readable
 $file = "$DATA_DIR/file2.txt";
 chmod 0220, $file;
-throws_ok { get_hash_from_file( $file ) } qr/File is not readable/, "file not readable";
+throws_ok { read_hash_file( $file ) } qr/File is not readable/, "file not readable";
 chmod 0664, $file;
 
 # file is empty
 $file = "$DATA_DIR/file3.txt";
 $expect = { };
-$got = get_hash_from_file( $file );
+$got = read_hash_file( $file );
 is_deeply( $got, $expect, "file is empty" );
 
 # file is a parenthesis instead of curly braces
 $file = "$DATA_DIR/file4.txt";
 $expect = { };
-$got = get_hash_from_file( $file );
+$got = read_hash_file( $file );
 is_deeply( $got, $expect, "file contains parentheses" );
 
 # file contains multiple top-level curly braces
 $file = "$DATA_DIR/file5.txt";
 $expect = { };
-$got = get_hash_from_file( $file );
+$got = read_hash_file( $file );
 is_deeply( $got, $expect, "file contains multiple top level curly braces" );
 
 # file is a simple hash
@@ -96,7 +96,7 @@ $expect = {
             m2 => "n2",
          },
 };
-$got = get_hash_from_file( $file );
+$got = read_hash_file( $file );
 is_deeply( $got, $expect, "file is a simple hash" );
 
 # file is a complex hash
@@ -119,7 +119,7 @@ $expect = {
                    },
          }
 };
-$got = get_hash_from_file( $file );
+$got = read_hash_file( $file );
 is_deeply( $got, $expect, "file is a complex hash" );
 
 done_testing();

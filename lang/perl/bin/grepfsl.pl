@@ -30,7 +30,7 @@ use My::Utils qw(
    grep_strs_in_array
    grepv_strs_in_array
    nvl
-   verify_dir_is_readable
+   is_dir_readable
 );
 
 
@@ -123,7 +123,7 @@ foreach my $str ( @strings )
 $opts{ debug } and dump_dbg_vars();
 
 # validate dir
-verify_dir_is_readable( $dir ) or confess "ERROR. dir not readable. dir=[$dir]";
+is_dir_readable( $dir ) or confess "ERROR. dir not readable. dir=[$dir]";
 
 # get filesys list and scan for strings
 my @filesys_list = ();

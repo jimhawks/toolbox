@@ -19,14 +19,14 @@ use FindBin;
 #--------------------------------------------------
 use lib "$FindBin::RealBin/../../../lib";
 use My::Utils qw(
-   get_conf_from_file
-   get_hash_from_file
+   read_conf_file
+   read_hash_file
 );
 
-my $href = get_hash_from_file( "./conf.pl" );
+my $href = read_hash_file( "./conf.pl" );
 print Dumper( $href );
 
-my $href2 = get_conf_from_file( "./conf.pl" );
+my $href2 = read_conf_file( "./conf.pl" );
 print Dumper( $href2 );
 
 exit 0;

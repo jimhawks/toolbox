@@ -21,7 +21,7 @@ use FindBin;
 use lib "$FindBin::RealBin/../lib";
 use My::Utils qw(
    grep_strs_in_array
-   is_non_empty
+   is_str_non_empty
    nvl
    trim
 );
@@ -79,8 +79,8 @@ sub print_tree
    my $node = nvl( shift, "" );
    my $tab  = nvl( shift, "" );
 
-   is_non_empty( $node ) or die "ERROR. node is empty";
-   is_non_empty( $tree{ $node } ) or die "ERROR.  node doesn't exist. node=[$node]";
+   is_str_non_empty( $node ) or die "ERROR. node is empty";
+   is_str_non_empty( $tree{ $node } ) or die "ERROR.  node doesn't exist. node=[$node]";
 
    print "$tab$node\n";
    foreach my $subnode ( @{ $tree{ $node } } )

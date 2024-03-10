@@ -16,7 +16,7 @@ use My::Utils qw(
    get_home_dir
    get_random_number
    is_array_cnt_even
-   is_non_empty
+   is_str_non_empty
    nvl
 );
 
@@ -130,7 +130,7 @@ sub _get_password
    my %args = @_;
 
    my $len = 0;
-   if ( is_non_empty( $args{ len } ) )
+   if ( is_str_non_empty( $args{ len } ) )
    {
       $len = $args{ len };
    }
@@ -187,7 +187,7 @@ sub _get_random_str
    while( length( $str ) < $len )
    {
       my $char = $self->_get_random_char();
-      if ( is_non_empty( $char ) )
+      if ( is_str_non_empty( $char ) )
       {
          $str .= $char;
       }
@@ -433,7 +433,7 @@ sub _set_data_dir_setting
    my $self = shift;
    my $value = shift;
 
-   is_non_empty( $value ) or confess "Value is empty";
+   is_str_non_empty( $value ) or confess "Value is empty";
 
    $self->{ settings }->{ data_dir } = $value;
 }
@@ -443,7 +443,7 @@ sub _set_letters_setting
    my $self = shift;
    my $value = shift;
 
-   is_non_empty( $value ) or confess "Value is empty";
+   is_str_non_empty( $value ) or confess "Value is empty";
    $value eq $YES or $value eq $NO 
       or confess "Value is invalid. value=[$value]";
 
@@ -455,7 +455,7 @@ sub _set_lowercase_setting
    my $self = shift;
    my $value = shift;
 
-   is_non_empty( $value ) or confess "Value is empty";
+   is_str_non_empty( $value ) or confess "Value is empty";
    $value eq $YES or $value eq $NO 
       or confess "Value is invalid. value=[$value]";
 
@@ -467,7 +467,7 @@ sub _set_numbers_setting
    my $self = shift;
    my $value = shift;
 
-   is_non_empty( $value ) or confess "Value is empty";
+   is_str_non_empty( $value ) or confess "Value is empty";
    $value eq $YES or $value eq $NO 
       or confess "Value is invalid. value=[$value]";
 
@@ -479,7 +479,7 @@ sub _set_symbols_setting
    my $self = shift;
    my $value = shift;
 
-   is_non_empty( $value ) or confess "Value is empty";
+   is_str_non_empty( $value ) or confess "Value is empty";
    $value eq $YES or $value eq $NO 
       or confess "Value is invalid. value=[$value]";
 
@@ -491,7 +491,7 @@ sub _set_uppercase_setting
    my $self = shift;
    my $value = shift;
 
-   is_non_empty( $value ) or confess "Value is empty";
+   is_str_non_empty( $value ) or confess "Value is empty";
    $value eq $YES or $value eq $NO 
       or confess "Value is invalid. value=[$value]";
 
@@ -503,7 +503,7 @@ sub _set_write_history_setting
    my $self = shift;
    my $value = shift;
 
-   is_non_empty( $value ) or confess "Value is empty";
+   is_str_non_empty( $value ) or confess "Value is empty";
    $value eq $YES or $value eq $NO 
       or confess "Value is invalid. value=[$value]";
 

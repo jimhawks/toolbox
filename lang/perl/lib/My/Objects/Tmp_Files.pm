@@ -15,7 +15,7 @@ use My::Constants qw(
 use My::Utils qw(
    get_home_dir
    is_array_cnt_even
-   is_non_empty
+   is_str_non_empty
    nem
    nvl
 );
@@ -119,7 +119,7 @@ sub get_new_file
 
    my $name = $self->get_dir()
               . "/" . $SCRIPT_PID
-              . ( is_non_empty( $self->get_tag() )
+              . ( is_str_non_empty( $self->get_tag() )
                   ? "." . $self->get_tag() : "" )
               . "." . $formatted_num 
               . ".tmp"
@@ -142,7 +142,7 @@ sub _add_name_to_list
    my $self = shift;
    my $value = shift;
 
-   is_non_empty( $value ) or confess "Value is empty";
+   is_str_non_empty( $value ) or confess "Value is empty";
 
    push( @{ $self->{ data }->{ files } }, $value );
 }
@@ -196,7 +196,7 @@ sub _set_dir
    my $self = shift;
    my $value = shift;
 
-   is_non_empty( $value ) or confess "Value is empty";
+   is_str_non_empty( $value ) or confess "Value is empty";
 
    $self->{ data }->{ dir } = $value;
 }
@@ -206,7 +206,7 @@ sub _set_keep_files_flag
    my $self = shift;
    my $value = shift;
 
-   is_non_empty( $value ) or confess "Value is empty";
+   is_str_non_empty( $value ) or confess "Value is empty";
    $value == $TRUE or $value == $FALSE or confess "Invalid value";
 
    $self->{ data }->{ keep_files_flag } = $value;

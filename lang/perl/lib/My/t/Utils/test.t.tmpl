@@ -12,7 +12,7 @@ use File::Basename;
 
 use lib "$FindBin::Bin/../../../../lib";
 use My::Utils qw(
-   verify_dir_exists
+   does_dir_exist
 );
 
 my $SCRIPT = basename( $0 );
@@ -29,7 +29,7 @@ my $dir = "";
 
 ## undef dirname
 #$dir = undef;
-#throws_ok { verify_dir_exists( $dir ) } qr/Dir name is empty/, "undef dir name";
+#throws_ok { does_dir_exist( $dir ) } qr/Dir name is empty/, "undef dir name";
 #
 ## file is nonempty, 1 line
 #$file = "$DATA_DIR/one_line";
@@ -38,7 +38,7 @@ my $dir = "";
 #is_deeply( \@got, \@expect, "1 line file" );
 #
 ## "is" check
-#is( is_empty(\%empty_array),     0, "empty array");
+#is( is_str_empty(\%empty_array),     0, "empty array");
 
 is( 1, 2, "not finished" );
 
