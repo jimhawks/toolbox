@@ -3,7 +3,6 @@
 use strict;
 use warnings;
 
-use Carp qw(confess);
 use File::Basename qw(basename);
 use File::Copy qw(move);
 use FindBin;
@@ -13,8 +12,6 @@ use Data::Dumper;
 use lib "$FindBin::RealBin/../lib";
 use My::Utils qw(
     clip_mp4_file
-    convert_mp4_to_gif
-    delete_file
     is_str_empty
     is_str_non_empty
 );
@@ -24,7 +21,7 @@ use My::Utils qw(
 my $SCRIPT_NM = basename( $0 );
 
 # globals
-my $file  = "";
+my $file   = "";
 my $start = "";
 my $end   = "";
 
@@ -36,10 +33,7 @@ my $end   = "";
 #------------------------------------------------------------
 
 get_cmd_line_args();
-my $clipped_file = clip_mp4_file($file, $start, $end);
-my $gif_file     = convert_mp4_to_gif($clipped_file);
-
-delete_file($clipped_file);
+clip_mp4_file($file, $start, $end);
 
 exit 0;
 
@@ -76,4 +70,3 @@ sub get_cmd_line_args
       exit 0;
    }
 }
-
