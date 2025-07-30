@@ -47,6 +47,7 @@ our @EXPORT = qw(
     get_list_of_nasdaq_tickers
     get_list_of_sizes
     get_os_type
+    get_random_5char_code
     get_random_birthdate
     get_random_color
     get_random_female_first_name
@@ -97,6 +98,7 @@ our @EXPORT = qw(
     substitute_shell_vars_in_str
     touch_files
     trim
+    verify_env_var
 );
 
 our @female_first_name_list = ();
@@ -491,6 +493,13 @@ sub get_os_type
     }
 
     return( $type );
+}
+
+sub get_random_5char_code
+{
+    my @chars = ('A'..'Z', '0'..'9');
+    my $code = join '', map { $chars[rand @chars] } 1..5;
+    return $code;
 }
 
 sub get_random_birthdate
@@ -1174,5 +1183,13 @@ sub trim
 {
     return( rtrim( ltrim( @_ ) ) );
 }
+
+sub verify_env_var
+{
+    my $var = shift // "";
+    is_str_non_empty( $var ) or confess "ERROR. Env var name is empty";
+    is_str_non_empty( $ENV{ $var } ) or confess "ERROR. Env var is not defined. var=[$var]";
+}
+
 
 1;

@@ -10,7 +10,8 @@ use FindBin;
 
 use Data::Dumper;
 
-use lib "$FindBin::RealBin/../lib";
+#use lib "$FindBin::RealBin/../lib";
+use lib $ENV{ TOOLBOX_PERL_LIB_DIR };
 use My::Utils qw(
     clip_mp4_file
     convert_mp4_to_gif
