@@ -20,5 +20,5 @@ my $full_path = File::Spec->catfile($toolbox_dir, 'projects', $rel_path, $script
 # Ensure the file exists
 die "Script not found: $full_path\n" unless -e $full_path;
 
-# Execute it (will replace current process)
+# Run it (will create a sub process)
 system($full_path, @args) or die "Failed to exec '$full_path': $!";
