@@ -49,12 +49,6 @@ is_str_non_empty( $config{clip_end} )   or confess "ERROR. config field is empty
 $config{clip_start} =~ /^\d{2}:\d{2}:\d{2}\.\d$/ or confess "config clip start is invalid. value=[$config{clip_start}]";
 $config{clip_end}   =~ /^\d{2}:\d{2}:\d{2}\.\d$/ or confess "config clip start is invalid. value=[$config{clip_end}]";
 
-# set options for called scripts
-my $clip_script_options = "";
-if ( $config{run_settings}{keep_work_files} ) {
-    $clip_script_options = "--keep-work-files";
-}
-
 # build output gif filename from clipping script
 my ($mp4_stem, undef) = get_file_stem_and_ext( $config{input_file} );
 my $output_gif_file = "$mp4_stem.clipped.gif";
@@ -68,7 +62,7 @@ if ( $config{gif_file} ) {
 # append 5char code for uniqueness if seting is turned on
 if ( $config{run_settings}{add_5char_code}) {
     my ($stem, $ext) = get_file_stem_and_ext( $renamed_gif_file );
-    $renamed_gif_file .= $stem . "." . get_random_5char_code() . "." . $ext;
+    $renamed_gif_file = $stem . "." . get_random_5char_code() . "." . $ext;
 }
 
 # run script to clip mp4 and convert to gif

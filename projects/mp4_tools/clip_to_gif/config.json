@@ -4,7 +4,6 @@
   "clip_end": "00:00:22.5",
   "gif_file": "someplace.event.gif",
   "run_settings": {
-    "keep_work_files": 0,
     "add_5char_code": 0
   }
 }

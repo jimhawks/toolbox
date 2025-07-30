@@ -40,8 +40,6 @@ get_cmd_line_args();
 my $clipped_file = clip_mp4_file($file, $start, $end);
 my $gif_file     = convert_mp4_to_gif($clipped_file);
 
-delete_file($clipped_file);
-
 exit 0;
 
 
