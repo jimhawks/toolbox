@@ -40,6 +40,7 @@ our @EXPORT = qw(
     get_dir_list
     get_file_list
     get_file_list_for_patterns
+    get_file_stem_and_ext
     get_home_dir
     get_list_of_colors
     get_list_of_files_and_dirs
@@ -394,6 +395,17 @@ sub get_file_list_for_patterns
     @files = remove_array_duplicates( @files );
 
     return( sort @files );
+}
+
+sub get_file_stem_and_ext
+{
+    my $file = shift // "";
+
+    my @parts = split(/\./, $file);
+    my $ext = pop @parts // "";
+    my $stem = join(".", @parts);
+
+    return ($stem, $ext);
 }
 
 sub get_home_dir
