@@ -197,7 +197,8 @@ sub clip_mp4_file
    my $cmd = "ffmpeg"
             . " -i $mp4_file"
             . " -ss $clip_start -to $clip_end"
-            . ' -vf "fps=30,scale=1280:-2" -c:v libx264 -preset veryfast -crf 18 -an'
+            . ' -vf "fps=30,scale=1280:-2" -c:v libx264 -preset veryfast -crf 18'
+            . " -c:a aac -b:a 128k"
             . " $clipped_mp4_file"
             ;
    system($cmd);
