@@ -67,14 +67,14 @@ if ( ! $dry_run ) {
         mp4_file     => $mp4_file, 
         clip_start   => $clip_start, 
         clip_end     => $clip_end,
-        debug        => 1,
-        dry_run      => 0,
+        #debug        => 1,
+        #dry_run      => 0,
     );
     my $created_gif_file = convert_mp4_to_gif(
         mp4_file => $clipped_mp4_file,
         gif_file => $gif_file,
-        debug    => 1,
-        dry_run  => 0,
+        #debug    => 1,
+        #dry_run  => 0,
     );
 }
 

@@ -97,7 +97,7 @@ my @cmd = (
     "project.pl",
     "mp4_tools/bin",
     "mp4.clip.to_gif.pl", 
-    "--debug",
+    #"--debug",
     #"--dry-run",
     $mp4_file, 
     $clip_start, 

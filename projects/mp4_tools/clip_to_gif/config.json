@@ -1,9 +1,9 @@
 {
-  "input_file": "source.mp4",
-  "clip_start": "00:00:03.4",
-  "clip_end": "00:00:22.5",
+  "mp4_file": "./source.mp4",
+  "clip_start": "00:00:02.8",
+  "clip_end": "00:00:17.7",
   "gif_file": "someplace.event.gif",
   "run_settings": {
-    "add_5char_code": 0
+    "add_5char_code": 1
   }
 }
