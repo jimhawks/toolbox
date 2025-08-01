@@ -8,6 +8,7 @@ use Data::Dumper;
 use feature "state";  # required for state vars
 
 use Carp qw( cluck confess );
+use File::Basename;
 use File::Find;
 use FindBin;
 use Getopt::Long;
@@ -35,11 +36,15 @@ our @EXPORT = qw(
     does_dir_exist
     does_file_exist
     dump_dbg_vars
+    flatten_filename
+    flatten_filename_safe
     get_cmd_line_args
     get_cmd_line_options
     get_dir_list
     get_file_list
     get_file_list_for_patterns
+    get_file_ext
+    get_file_stem
     get_file_stem_and_ext
     get_home_dir
     get_list_of_colors
@@ -72,6 +77,7 @@ our @EXPORT = qw(
     grepv_str_in_array
     grepv_strs_in_array
     grepi_array
+    inflate_filename_safe
     is_array_cnt_even
     is_array_empty
     is_dir_readable
@@ -79,8 +85,10 @@ our @EXPORT = qw(
     is_hash_empty
     is_item_in_array
     is_linux
+    is_mp4_file
     is_str_empty
     is_str_non_empty
+    is_valid_timecode
     is_windows
     ltrim
     nem
@@ -177,76 +185,133 @@ sub add_new_lines
 
 sub clip_mp4_file
 {
-   my ($mp4_file, $clip_start, $clip_end) = @_;
+    my (undef, undef, undef, $func) = caller(0);
 
-   # decompose mp4 filename into stem and ext
-   my @parts = split(/\./, $mp4_file);
-   my $file_ext = pop @parts // "";
-   my $file_stem = join(".", @parts);
+    # receive args
+    my %args = @_;
 
-   #verify its an mp4 file
-   (is_str_non_empty($file_ext) and $file_ext eq "mp4") or confess "ERROR. extension is not mp4. ext=[$file_ext]";
+    my $mp4_file         = $args{mp4_file}         // "";
+    my $clip_start       = $args{clip_start}       // "";
+    my $clip_end         = $args{clip_end}         // "";
+    my $clipped_mp4_file = $args{clipped_mp4_file} // "";
+    my $debug            = $args{debug}            // 0;
+    my $dry_run          = $args{dry_run}          // 0;
 
-   # build output filename
-   my $clipped_mp4_file = "$file_stem.clipped.mp4";
+    if ( $debug ) {
+        print "$func - args\n";
+        print Dumper( \%args );
+    }
 
-   # remove files
-   ! -e $clipped_mp4_file or delete_file($clipped_mp4_file);
+    # validate args
+    is_str_non_empty( $mp4_file )   or confess "ERROR. mp4_file is empty";
+    is_str_non_empty( $clip_start ) or confess "ERROR. clip_start is empty";
+    is_str_non_empty( $clip_end )   or confess "ERROR. clip_end is empty";
 
-   #run clipping command
-   my $cmd = "ffmpeg"
+    -e $mp4_file           or confess "ERROR. File doesnt exist. file=[$mp4_file]";
+    is_mp4_file($mp4_file) or confess "ERROR. File extension is not mp4. file=[$mp4_file]";
+
+    is_valid_timecode($clip_start) or confess "ERROR. clip start is invalid. value=[$clip_start]";
+    is_valid_timecode($clip_end)   or confess "ERROR. clip end is invalid. value=[$clip_end]";
+
+    # set defaults
+    if ( is_str_empty( $clipped_mp4_file) ) {
+        $clipped_mp4_file = get_file_stem( basename( $mp4_file )  ) . ".clipped.mp4";
+    }
+
+    # remove files
+    -e $clipped_mp4_file and delete_file($clipped_mp4_file);
+
+    #run clipping command
+    my $cmd = "ffmpeg"
             . " -i $mp4_file"
             . " -ss $clip_start -to $clip_end"
             . ' -vf "fps=30,scale=1280:-2" -c:v libx264 -preset veryfast -crf 18'
             . " -c:a aac -b:a 128k"
             . " $clipped_mp4_file"
             ;
-   system($cmd);
+    if ( $debug ) {
+        print "$func - cmd\n";
+        print "    cmd=[$cmd]\n";
+    }
+    if (! $dry_run) {
+        system($cmd);
+    }
 
-   return($clipped_mp4_file);
+    return($clipped_mp4_file);
 }
 
 sub convert_mp4_to_gif
 {
-   my ($mp4_file, $clip_start, $clip_end) = @_;
+    my (undef, undef, undef, $func) = caller(0);
 
-   my $palette_file = "palette.png";
+    # receive args
+    my %args = @_;
 
-   # decompose mp4 filename into stem and ext
-   my @parts = split(/\./, $mp4_file);
-   my $file_ext = pop @parts // "";
-   my $file_stem = join(".", @parts);
+    my $mp4_file = $args{mp4_file}  // "";
+    my $gif_file = $args{gif_file}  // "";
+    my $debug    = $args{debug}     // 0;
+    my $dry_run  = $args{dry_run}   // 0;
 
-   # verify its an mp4 file
-   (is_str_non_empty($file_ext) and $file_ext eq "mp4") or confess "ERROR. extension is not mp4. ext=[$file_ext]";
+    if ( $debug ) {
+        print "$func - args\n";
+        print Dumper( \%args );
+    }
 
-   # build output filename
-   my $gif_file = "$file_stem.gif";
+    # validate args
+    -e $mp4_file           or confess "ERROR. File doesnt exist. file=[$mp4_file]";
+    is_mp4_file($mp4_file) or confess "ERROR. File extension is not mp4. file=[$mp4_file]";
 
-   # remove files
-   ! -e $gif_file     or delete_file($gif_file);
-   ! -e $palette_file or delete_file($palette_file);
+    # set file names
+    my $palette_file = "palette.png";
+    if ( is_str_empty( $gif_file ) ) {
+        $gif_file = get_file_stem( basename( $mp4_file ) ) . ".gif";
+    }
 
-   # run cmd to get the palette
-   my $palette_cmd = "ffmpeg"
+    if ( $debug ) {
+        print "$func - created files\n";
+        print "     palette_file = [$palette_file]\n";
+        print "     gif_file     = [$gif_file]\n";
+    }
+
+    # remove files
+    -e $palette_file and delete_file($palette_file);
+    -e $gif_file     and delete_file($gif_file);
+
+    # run cmd to get the palette
+    my $palette_cmd = "ffmpeg"
             . " -i $mp4_file"
             . ' -vf "fps=15,scale=640:-1:flags=lanczos,palettegen"'
             . " $palette_file"
             ;
-   system($palette_cmd);
+    if ( $debug ) {
+        print "$func - palette cmd\n";
+        print "     cmd = [$palette_cmd]\n";
+    }
+    if (! $dry_run) {
+        system($palette_cmd);
+    }
 
-   # run cmd to do conversion to gif
-   my $conversion_cmd = "ffmpeg"
+    # run cmd to do conversion to gif
+    my $conversion_cmd = "ffmpeg"
             . " -i $mp4_file"
             . " -i $palette_file"
             . ' -filter_complex "fps=15,scale=640:-1:flags=lanczos[x];[x][1:v]paletteuse=dither=bayer:bayer_scale=5"'
             . " $gif_file"
             ;
-   system($conversion_cmd);
+    if ( $debug ) {
+        print "$func - convert cmd\n";
+        print "     cmd = [$conversion_cmd]\n";
+    }
+    if (! $dry_run) {
+        system($conversion_cmd);
+    }
 
-   delete_file($palette_file);
+    # delete temp file
+    if (! $dry_run) {
+        delete_file($palette_file);
+    }
 
-   return($gif_file);
+    return($gif_file);
 }
 
 sub delete_file
@@ -281,6 +346,20 @@ sub does_file_exist
 sub dump_dbg_vars
 {
     print Dumper( \%dbg_vars );
+}
+
+sub flatten_filename
+{
+    my $filename = shift // "";
+    $filename =~ s/\./_/g;
+    return $filename;
+}
+
+sub flatten_filename_safe
+{
+    my $filename = shift // "";
+    $filename =~ s/\./_DOT_/g;
+    return $filename;
 }
 
 sub get_cmd_line_args
@@ -396,6 +475,18 @@ sub get_file_list_for_patterns
     @files = remove_array_duplicates( @files );
 
     return( sort @files );
+}
+
+sub get_file_ext
+{
+    my ($stem, $ext) = get_file_stem_and_ext( @_ );
+    return $ext;
+}
+
+sub get_file_stem
+{
+    my ($stem, $ext) = get_file_stem_and_ext( @_ );
+    return $stem;
 }
 
 sub get_file_stem_and_ext
@@ -902,6 +993,14 @@ sub grepi_array
     return( @matching_lines );
 }
 
+sub inflate_filename_safe
+{
+    my $filename = shift // "";
+    $filename =~ s/_DOT_/./g;
+    return $filename;
+}
+
+
 sub is_array_cnt_even
 {
     my @arr = @_;
@@ -980,6 +1079,13 @@ sub is_linux
     return( get_os_type() eq "linux" ? 1 : 0 );
 }
 
+sub is_mp4_file 
+{
+    my $file = shift // "";
+    is_str_non_empty( $file ) or return 0;
+    return get_file_ext( $file ) eq "mp4";
+}
+
 sub is_str_empty
 {
     my $str = shift;
@@ -992,6 +1098,12 @@ sub is_str_non_empty
     my $str = shift;
     my $rc = ( defined( $str ) and length( $str ) > 0 ) ? 1 : 0;
     return( $rc );
+}
+
+sub is_valid_timecode
+{
+    my ($tc) = @_;
+    return $tc =~ /^(\d{2}):([0-5]\d):([0-5]\d)\.\d$/; 
 }
 
 sub is_windows
